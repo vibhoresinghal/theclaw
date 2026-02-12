@@ -18,27 +18,55 @@
     <!-- ============ PHASE 1: LANDING ============ -->
     <div id="landing">
         <div class="hearts-bg"></div>
+
+        <!-- Floating face dolls in background -->
+        <div class="floating-dolls">
+            <img src="face1.png" class="float-doll doll-1" alt="">
+            <img src="face2.png" class="float-doll doll-2" alt="">
+            <img src="face3.png" class="float-doll doll-3" alt="">
+            <img src="face4.png" class="float-doll doll-4" alt="">
+            <img src="face5.png" class="float-doll doll-5" alt="">
+        </div>
+
         <div class="postcard">
-            <!-- Decorative corner flourishes -->
             <div class="postcard-inner">
                 <div class="star star-tl">✦</div>
                 <div class="star star-tr">✦</div>
                 <div class="star star-bl">✦</div>
                 <div class="star star-br">✦</div>
 
-                <p class="postcard-top-left">A little game,<br>made with love</p>
-                <p class="postcard-top-right">For the one who<br>has my heart</p>
+                <div class="postcard-eyebrow">💌 A Valentine's Letter</div>
 
-                <h1 class="postcard-title">Happy<br>Valentine's</h1>
-                <p class="postcard-subtitle">— Rupali —</p>
+                <h1 class="postcard-title">Catch My<br>Heart</h1>
+                <p class="postcard-subtitle">— For Rupali —</p>
 
-                <p class="postcard-body">I'm a man of many moods & many versions,<br>but every single one of them is
-                    yours.<br>Can you catch them all?</p>
+                <div class="postcard-divider">♥ ♥ ♥</div>
 
-                <button class="play-btn" onclick="startGame()">LET'S PLAY</button>
+                <p class="postcard-body">
+                    Hi Rupiiii,<br><br>
+                    Vibhuu comes in many moods — the silly one, the dramatic one,
+                    the one who can't stop staring at you…<br><br>
+                    But every single version of him? <strong>Yours.</strong><br>
+                    Can you catch them all? 🎪
+                </p>
 
-                <p class="postcard-footer-left">Use arrow keys<br>to catch 'em all</p>
-                <p class="postcard-footer-right">Feb 14, 2026<br>❤️</p>
+                <div class="postcard-doll-row">
+                    <img src="face1.png" class="doll-preview" alt="">
+                    <img src="face2.png" class="doll-preview" alt="">
+                    <img src="face3.png" class="doll-preview" alt="">
+                    <img src="face4.png" class="doll-preview" alt="">
+                    <img src="face5.png" class="doll-preview" alt="">
+                </div>
+                <p class="postcard-doll-caption">↑ These little guys are waiting inside ↑</p>
+
+                <button class="play-btn" onclick="startGame()">
+                    <span class="play-btn-emoji">🎰</span> LET'S PLAY
+                </button>
+
+                <div class="postcard-footer-row">
+                    <p class="postcard-footer-left">Use ← → to move<br>Space to catch</p>
+                    <p class="postcard-footer-right">Feb 14, 2026<br>With all my love ❤️</p>
+                </div>
             </div>
         </div>
     </div>
@@ -88,6 +116,16 @@
     <!-- ============ PHASE 4: FINALE ============ -->
     <div id="finale">
         <div class="hearts-bg"></div>
+
+        <!-- Floating face dolls in background -->
+        <div class="floating-dolls">
+            <img src="face1.png" class="float-doll doll-1" alt="">
+            <img src="face2.png" class="float-doll doll-2" alt="">
+            <img src="face3.png" class="float-doll doll-3" alt="">
+            <img src="face4.png" class="float-doll doll-4" alt="">
+            <img src="face5.png" class="float-doll doll-5" alt="">
+        </div>
+
         <div class="postcard postcard-finale">
             <div class="postcard-inner">
                 <div class="star star-tl">✦</div>
@@ -95,12 +133,30 @@
                 <div class="star star-bl">✦</div>
                 <div class="star star-br">✦</div>
 
-                <h2 class="finale-title">No matter which<br>version of me<br>you catch…</h2>
-                <p class="finale-subtitle">you've already won my heart.</p>
-                <div class="finale-divider">❦</div>
-                <p class="finale-love">I love you, Rupali</p>
-                <div class="finale-hearts">♥</div>
-                <button class="restart-btn" onclick="restartGame()">PLAY AGAIN</button>
+                <p class="finale-eyebrow" id="finale-eyebrow">✨ You caught all vibhu's ✨</p>
+
+                <h2 class="finale-title" id="finale-title">No matter which<br>version of me<br>you catch…</h2>
+
+                <div class="finale-doll-gallery">
+                    <img src="face1.png" class="finale-doll" alt="">
+                    <img src="face2.png" class="finale-doll" alt="">
+                    <img src="face3.png" class="finale-doll" alt="">
+                    <img src="face4.png" class="finale-doll" alt="">
+                    <img src="face5.png" class="finale-doll" alt="">
+                </div>
+
+                <p class="finale-subtitle" id="finale-subtitle">…every single one of them<br>is already yours. Forever.
+                    💕</p>
+
+                <div class="finale-love-note">
+                    <div class="love-note-line"></div>
+
+                    <p class="finale-love">I love you, Rupali</p>
+                    <p class="finale-signoff">— Your biggest fan, always & forever —</p>
+                    <div class="finale-hearts">💗 💗 💗</div>
+                    <div class="love-note-line"></div>
+                </div>
+                <button class="restart-btn" onclick="restartGame()">🎰 PLAY AGAIN</button>
             </div>
         </div>
     </div>

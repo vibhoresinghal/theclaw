@@ -1,16 +1,23 @@
 const { Engine, Render, Runner, Bodies, Body, Composite, Events } = Matter;
 
+// Constants must be defined first
+const CLAW_Y_TOP = 40;
+const CLAW_SPEED = 3.5;
+const GRAB_RADIUS = 55;
+const SEPARATOR_X_RATIO = 0.15;
+
 let engine, render, runner;
 let chuteEngine, chuteRender, chuteRunner;
 let items = [];
 let chuteItemsPhysics = [];
 let gameState = 'idle';
-let clawX = 0, clawCurrentY = 40;
+let VW = 460, VH = 350;
+let clawX = VW / 2, clawCurrentY = CLAW_Y_TOP;
 let gameTimer = 60, timerInterval = null;
 let miniMeCount = 0, gameActive = false;
 let grabbedItem = null, clawOpen = 1, clawAnimFrame = 0;
+let clawSway = 0, clawSwayVel = 0; // Current sway angle and its velocity
 let keysPressed = {};
-let VW = 460, VH = 350;
 let CVW = 0, CVH = 0; // Chute Viewport Dimensions
 let viewportEl, chuteEl;
 let faceImages = [];
@@ -19,12 +26,6 @@ for (let i = 1; i <= 5; i++) {
   img.src = `face${i}.png`;
   faceImages.push(img);
 }
-
-
-const CLAW_Y_TOP = 40;
-const CLAW_SPEED = 3.5;
-const GRAB_RADIUS = 55;
-const SEPARATOR_X_RATIO = 0.15;
 
 // ===== AUDIO ENGINE =====
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -291,6 +292,12 @@ function updateClaw() {
   if (!gameActive) return;
   const sepX = Math.floor(VW * SEPARATOR_X_RATIO);
 
+  // Calculate Sway (Pendulum Physics)
+  const swayTarget = keysPressed['ArrowLeft'] ? 0.08 : (keysPressed['ArrowRight'] ? -0.08 : 0);
+  clawSwayVel += (swayTarget - clawSway) * 0.1;
+  clawSwayVel *= 0.85; // Friction
+  clawSway += clawSwayVel;
+
   if (gameState === 'idle') {
     if (keysPressed['ArrowLeft']) clawX = Math.max(20, clawX - CLAW_SPEED);
     if (keysPressed['ArrowRight']) clawX = Math.min(VW - 20, clawX + CLAW_SPEED);
@@ -387,7 +394,13 @@ function tryGrab() {
     }
   }
   if (candidates.length === 0) return null;
-  // Pick the topmost item (lowest Y = highest on screen)
+  // Prioritize minime faces over hearts
+  const faces = candidates.filter(c => c.type === 'minime');
+  if (faces.length > 0) {
+    faces.sort((a, b) => a.body.position.y - b.body.position.y);
+    return faces[0];
+  }
+  // Otherwise pick the topmost heart
   candidates.sort((a, b) => a.body.position.y - b.body.position.y);
   return candidates[0];
 }
@@ -483,7 +496,7 @@ function collectItem(item) {
 function showYay() {
   const yay = document.createElement('div');
   yay.className = 'yay-pop';
-  yay.textContent = '🎉 Yay!';
+  yay.textContent = '💋 Mwwah!';
   yay.style.left = '50%'; yay.style.top = '50%';
   yay.style.transform = 'translate(-50%,-50%)';
   document.body.appendChild(yay);
@@ -509,6 +522,22 @@ function endGame() {
   if (!gameActive) return;
   gameActive = false;
   clearInterval(timerInterval);
+
+  // Update Finale Text Context based on score
+  const eyebrow = document.getElementById('finale-eyebrow');
+  const title = document.getElementById('finale-title');
+  const subtitle = document.getElementById('finale-subtitle');
+
+  if (miniMeCount >= 5) {
+    eyebrow.textContent = '✨ You caught all Vibhu\'s ✨';
+    title.innerHTML = 'No matter which<br>version of me<br>you catch…';
+    subtitle.innerHTML = '…every single one of them<br>is already yours. Forever. 💕';
+  } else {
+    eyebrow.textContent = `✨ You caught ${miniMeCount} Vibhu's ✨`;
+    title.innerHTML = 'Even if you only<br>catch a few of me…';
+    subtitle.innerHTML = '…every version of me<br>already belongs to you. 💕';
+  }
+
   setTimeout(() => {
     document.getElementById('game-screen').style.opacity = '0';
     document.getElementById('game-screen').style.transition = 'opacity 1.5s';
@@ -531,36 +560,38 @@ function customDraw() {
   updateClaw();
 
   const sepX = Math.floor(VW * SEPARATOR_X_RATIO);
+  const outlineColor = '#4a1a2c';
 
   ctx.save();
 
   // Chute zone indicator - subtle on the LEFT
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
   ctx.fillRect(0, 0, sepX, VH);
 
-  // Arrow pointing down
-  ctx.fillStyle = '#ff477e';
+  // Arrow pointing down and label
+  ctx.fillStyle = outlineColor;
   ctx.font = 'bold 20px Fredoka One';
   ctx.textAlign = 'center';
   ctx.fillText('▼', sepX / 2, VH * 0.25);
   ctx.font = '12px Fredoka One';
   ctx.fillText('DROP', sepX / 2, VH * 0.15);
 
-  // Arrow pointing down in chute zone (LEFT SIDE)
-  const isOverChute = clawX < sepX;
-  if (gameState === 'holding' && isOverChute) {
-    ctx.fillStyle = 'rgba(255, 71, 126, 0.2)';
-    ctx.font = '24px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('⬇', sepX / 2, VH - 20);
-  }
+  // Claw Cable - Matching the reference image style
+  ctx.strokeStyle = outlineColor;
+  ctx.lineWidth = 6; // Thicker outline
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(clawX, 0);
+  ctx.lineTo(clawX, clawCurrentY);
+  ctx.stroke();
 
-  // Claw rope
-  // Draw Rope - Pinkish/White
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
-  ctx.setLineDash([5, 5]); // Cute dashed rope
-  ctx.beginPath(); ctx.moveTo(clawX, 0); ctx.lineTo(clawX, clawCurrentY); ctx.stroke();
-  ctx.setLineDash([]);
+  // Inner cable color
+  ctx.strokeStyle = '#f0f0f0';
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.moveTo(clawX, 0);
+  ctx.lineTo(clawX, clawCurrentY - 10);
+  ctx.stroke();
 
   drawClaw(ctx, clawX, clawCurrentY, clawOpen);
 
@@ -575,10 +606,10 @@ function customDraw() {
     ctx.restore();
   }
 
-  // Highlight grab zone when dropping
+  // Grab zone feedback
   if (gameState === 'dropping' || gameState === 'grabbing') {
-    ctx.strokeStyle = 'rgba(58,42,26,0.35)';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(74, 26, 44, 0.25)';
+    ctx.lineWidth = 2;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
     ctx.arc(clawX, clawCurrentY + 28, GRAB_RADIUS, 0, Math.PI * 2);
@@ -589,65 +620,144 @@ function customDraw() {
   ctx.restore();
 }
 
+// ===== DRAWING HELPERS =====
 function drawHeart(ctx, x, y, size) {
-  ctx.save(); ctx.translate(x, y);
-  const s = size / 16; ctx.scale(s, s);
-  ctx.beginPath(); ctx.moveTo(0, 6);
+  ctx.save();
+  ctx.translate(x, y);
+  const s = size / 16;
+  ctx.scale(s, s);
+
+  const outlineColor = '#4a1a2c';
+  const heartColor = '#c9184a'; // Redder tint
+
+  ctx.beginPath();
+  ctx.moveTo(0, 6);
   ctx.bezierCurveTo(-1, -4, -16, -6, -16, 4);
   ctx.bezierCurveTo(-16, 12, 0, 20, 0, 24);
   ctx.bezierCurveTo(0, 20, 16, 12, 16, 4);
   ctx.bezierCurveTo(16, -6, 1, -4, 0, 6);
   ctx.closePath();
-  const grad = ctx.createRadialGradient(0, 8, 2, 0, 8, 20);
-  grad.addColorStop(0, '#ff6b8a'); grad.addColorStop(1, '#cc2244');
-  ctx.fillStyle = grad; ctx.fill();
-  ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
-  ctx.beginPath(); ctx.arc(-5, 2, 3, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
+
+  // Subtle gradient for depth
+  const grad = ctx.createRadialGradient(0, 4, 4, 0, 8, 20);
+  grad.addColorStop(0, '#ff4d6d'); // Brighter red top
+  grad.addColorStop(1, '#b3002d'); // Deep red bottom
+
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.strokeStyle = outlineColor;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Simple, tiny highlight
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(-5, 2, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+
   ctx.restore();
 }
 
 function drawMiniMe(ctx, x, y, r, img) {
   const displayImg = img || faceImages[0];
+  const outlineColor = '#4a1a2c';
   ctx.save();
   if (displayImg && displayImg.complete && displayImg.naturalWidth !== 0) {
     ctx.drawImage(displayImg, x - r, y - r, r * 2, r * 2);
   } else {
-    // Fallback logic
+    // Fallback logic - Cute face
     const grad = ctx.createRadialGradient(0, -2, 2, 0, 0, r);
     grad.addColorStop(0, '#ffe8b0'); grad.addColorStop(1, '#f4c87a');
-    ctx.translate(x, y); ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.translate(x, y);
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.fillStyle = grad; ctx.fill();
-    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.strokeStyle = outlineColor; ctx.lineWidth = 3; ctx.stroke();
     // Eyes
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = outlineColor;
     ctx.beginPath(); ctx.arc(-5, -3, 2.5, 0, Math.PI * 2); ctx.arc(5, -3, 2.5, 0, Math.PI * 2); ctx.fill();
     // Smile
-    ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+    ctx.strokeStyle = outlineColor; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(0, 1, 6, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
   }
   ctx.restore();
 }
 
 function drawClaw(ctx, x, y, openness) {
-  ctx.save(); ctx.translate(x, y);
-  ctx.fillStyle = '#ffebf1'; ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.roundRect(-15, -8, 30, 18, 5); ctx.fill(); ctx.stroke();
-  const angle = 0.2 + openness * 0.5;
-  // Arms - Soft pink
-  ctx.save(); ctx.rotate(-angle);
-  ctx.fillStyle = '#ffc2d1'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.moveTo(-4, 8); ctx.lineTo(-8, 35); ctx.lineTo(-14, 38);
-  ctx.lineTo(-12, 42); ctx.lineTo(0, 40); ctx.lineTo(4, 8);
-  ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+  ctx.save();
+  ctx.translate(x, y);
 
-  ctx.save(); ctx.rotate(angle);
-  ctx.fillStyle = '#ffc2d1'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2.5;
+  // Apply Sway
+  ctx.rotate(clawSway);
+
+  const outlineColor = '#47313a'; // Match the soft dark sketch outline
+  const headColor = '#e6e6e6';   // Clean light grey
+  const armColor = '#f2f2f2';    // Brighter grey for arms
+  const heartColor = '#ffb3c1';  // Pastel pink for the mascot heart
+
+  // 1. Decorative Heart (The mascot on top)
+  ctx.save();
+  ctx.translate(0, -22);
+  ctx.scale(0.6, 0.6); // Mini heart
   ctx.beginPath();
-  ctx.moveTo(4, 8); ctx.lineTo(8, 35); ctx.lineTo(14, 38);
-  ctx.lineTo(12, 42); ctx.lineTo(0, 40); ctx.lineTo(-4, 8);
-  ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+  ctx.moveTo(0, 6);
+  ctx.bezierCurveTo(-1, -4, -16, -6, -16, 4);
+  ctx.bezierCurveTo(-16, 12, 0, 20, 0, 24);
+  ctx.bezierCurveTo(0, 20, 16, 12, 16, 4);
+  ctx.bezierCurveTo(16, -6, 1, -4, 0, 6);
+  ctx.closePath();
+  ctx.fillStyle = heartColor;
+  ctx.fill();
+  ctx.strokeStyle = outlineColor;
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.restore();
+
+  // 2. Main Housing (The rounded grey block)
+  ctx.fillStyle = headColor;
+  ctx.strokeStyle = outlineColor;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(-22, -10, 44, 18, 10);
+  ctx.fill();
+  ctx.stroke();
+
+  const angle = 0.1 + openness * 0.6;
+
+  // 3. Arms with Circular Joints
+  const drawArmPair = (side) => {
+    ctx.save();
+    ctx.translate(side * 14, 5);
+    ctx.scale(side, 1); // Perfectly mirror the coordinate system for this side
+
+    ctx.rotate(angle); // Positive angle rotates 'outward' for both arms
+
+    // Shoulder Joint Circle
+    ctx.fillStyle = headColor;
+    ctx.strokeStyle = outlineColor;
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    // Arm Segment (drawn once, mirrored by scale)
+    ctx.fillStyle = armColor;
+    ctx.beginPath();
+    ctx.moveTo(-3.5, 6);
+    ctx.lineTo(3.5, 6);
+    // Tapered and curved look pulling outward (+X)
+    ctx.quadraticCurveTo(10, 20, 6, 38);
+    ctx.lineTo(0, 38);
+    ctx.quadraticCurveTo(4, 20, -3.5, 6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
+  drawArmPair(-1);
+  drawArmPair(1);
+
   ctx.restore();
 }
 

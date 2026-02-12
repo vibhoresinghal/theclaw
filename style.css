@@ -11,11 +11,11 @@ body {
   height: 100vh;
   overflow: hidden;
   font-family: 'Outfit', sans-serif;
-  background: #b8243c;
+  background: #fff0f3;
 }
 
 /* ================================================================
-   LANDING PAGE — Vintage Cream Postcard on Deep Crimson
+   LANDING PAGE — Premium Dark Rose Glassmorphic
    ================================================================ */
 #landing {
   position: fixed;
@@ -24,7 +24,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #b8243c;
+  background: linear-gradient(135deg, #fff0f3 0%, #fde2e4 40%, #ffc2d1 100%);
   transition: opacity 1.2s ease, transform 1.2s ease;
 }
 
@@ -47,7 +47,7 @@ body {
   font-size: 24px;
   opacity: 0.15;
   animation: floatUp linear infinite;
-  color: #e8a0b0;
+  color: #ff85a2;
 }
 
 @keyframes floatUp {
@@ -70,7 +70,7 @@ body {
   }
 }
 
-/* === THE POSTCARD === */
+/* === THE POSTCARD — Glassmorphic Card === */
 .postcard {
   position: relative;
   z-index: 2;
@@ -90,39 +90,51 @@ body {
   }
 }
 
-/* Stamp-edge perforated border */
+/* Glowing border */
 .postcard::before {
   content: '';
   position: absolute;
-  inset: -12px;
-  /* Scalloped border effect using radial gradient */
-  background: var(--stamp-bg, #b8243c);
-  mask-image: radial-gradient(circle 6px at 12px 6px, transparent 5px, black 5.5px);
-  -webkit-mask-image: radial-gradient(circle 6px at 12px 6px, transparent 5px, black 5.5px);
-  mask-size: 24px 100%;
-  -webkit-mask-size: 24px 100%;
-  mask-repeat: repeat;
-  -webkit-mask-repeat: repeat;
+  inset: -2px;
+  background: linear-gradient(135deg, #ff477e, #ff85a2, #ffb3c6, #ff477e);
+  border-radius: 22px;
   z-index: -1;
-  border-radius: 4px;
+  animation: borderGlow 4s ease-in-out infinite;
+  filter: blur(6px);
+}
+
+@keyframes borderGlow {
+
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .postcard-inner {
   position: relative;
-  background: #faf3ed;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   padding: 52px 40px 44px;
-  /* Real paper texture via subtle noise */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  border: 2px solid #e8c8b8;
+  border: 1px solid rgba(255, 71, 126, 0.15);
+  border-radius: 20px;
   text-align: center;
+  box-shadow:
+    0 25px 60px rgba(180, 60, 100, 0.12),
+    inset 0 0 40px rgba(255, 133, 162, 0.04);
 }
 
 /* Decorative stars */
 .star {
   position: absolute;
-  color: #b8243c;
+  color: #ff477e;
   font-size: 18px;
   line-height: 1;
+  opacity: 0.35;
 }
 
 .star-tl {
@@ -145,103 +157,245 @@ body {
   right: 22px;
 }
 
-/* Top corner captions */
-.postcard-top-left,
-.postcard-top-right {
-  position: absolute;
-  top: 20px;
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 0.78rem;
-  color: #b8243c;
-  line-height: 1.5;
-  opacity: 0.7;
+/* Eyebrow label */
+.postcard-eyebrow {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #ff477e;
+  opacity: 0.8;
+  margin-bottom: 12px;
 }
 
-.postcard-top-left {
-  left: 50px;
-  text-align: left;
-}
-
-.postcard-top-right {
-  right: 50px;
-  text-align: right;
-}
-
-/* Main title — elegant script */
+/* Main title — gradient text */
 .postcard-title {
-  font-family: 'Satisfy', cursive;
+  font-family: 'Fredoka One', cursive;
   font-size: clamp(2.8rem, 9vw, 4.4rem);
-  color: #b8243c;
+  background: linear-gradient(135deg, #ff477e, #ff85a2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1.15;
-  margin: 30px 0 8px;
+  margin: 10px 0 8px;
   letter-spacing: -0.5px;
 }
 
 .postcard-subtitle {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.4rem;
-  color: #b8243c;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.15rem;
+  color: #ff477e;
   letter-spacing: 6px;
   text-transform: uppercase;
-  margin-bottom: 28px;
+  margin-bottom: 16px;
   font-weight: 400;
+  opacity: 0.8;
+}
+
+/* Decorative divider */
+.postcard-divider {
+  font-size: 0.9rem;
+  color: #ff477e;
+  opacity: 0.3;
+  letter-spacing: 8px;
+  margin-bottom: 20px;
 }
 
 .postcard-body {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1rem;
-  color: #7a3a4a;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: 1.05rem;
+  color: #4a1525;
   line-height: 1.9;
-  margin-bottom: 36px;
+  margin-bottom: 24px;
   opacity: 0.85;
 }
 
-/* Play button — solid crimson, understated elegance */
+.postcard-body strong {
+  color: #ff477e;
+  font-weight: 700;
+}
+
+/* Doll previews inside the postcard */
+.postcard-doll-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.doll-preview {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  animation: dollBob 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 10px rgba(255, 71, 126, 0.4));
+}
+
+.doll-preview:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.doll-preview:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.doll-preview:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
+.doll-preview:nth-child(5) {
+  animation-delay: 1.2s;
+}
+
+@keyframes dollBob {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.postcard-doll-caption {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  color: #ff477e;
+  opacity: 0.65;
+  margin-bottom: 28px;
+  letter-spacing: 1px;
+}
+
+/* Play button — Premium gradient pill */
 .play-btn {
   display: inline-block;
-  padding: 15px 52px;
-  background: #b8243c;
+  padding: 16px 52px;
+  background: linear-gradient(135deg, #ff477e, #ff85a2);
   border: none;
-  color: #faf3ed;
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: 4px;
+  color: #fff;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.05rem;
+  letter-spacing: 3px;
   text-transform: uppercase;
   cursor: pointer;
+  border-radius: 50px;
   transition: all 0.3s ease;
   position: relative;
+  box-shadow: 0 8px 30px rgba(255, 71, 126, 0.35);
 }
 
 .play-btn:hover {
-  background: #9a1e33;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(184, 36, 60, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(255, 71, 126, 0.55);
+}
+
+.play-btn-emoji {
+  margin-right: 6px;
+}
+
+/* Footer row */
+.postcard-footer-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 71, 126, 0.12);
+}
+
+.postcard-footer-row .postcard-footer-left,
+.postcard-footer-row .postcard-footer-right {
+  position: static;
 }
 
 /* Footer text */
 .postcard-footer-left,
 .postcard-footer-right {
-  position: absolute;
-  bottom: 16px;
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 0.72rem;
-  color: #b8243c;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  color: #ff477e;
   line-height: 1.5;
-  opacity: 0.6;
+  opacity: 0.65;
+  font-weight: 400;
 }
 
 .postcard-footer-left {
-  left: 50px;
   text-align: left;
 }
 
 .postcard-footer-right {
-  right: 50px;
   text-align: right;
+}
+
+/* Floating face dolls in background */
+.floating-dolls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.float-doll {
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  object-fit: cover;
+  opacity: 0.12;
+  filter: blur(1px) drop-shadow(0 4px 8px rgba(255, 71, 126, 0.3));
+  animation: floatDoll 12s ease-in-out infinite;
+}
+
+.doll-1 {
+  top: 8%;
+  left: 5%;
+  animation-delay: 0s;
+}
+
+.doll-2 {
+  top: 15%;
+  right: 8%;
+  animation-delay: 2s;
+}
+
+.doll-3 {
+  bottom: 20%;
+  left: 10%;
+  animation-delay: 4s;
+}
+
+.doll-4 {
+  bottom: 10%;
+  right: 5%;
+  animation-delay: 6s;
+}
+
+.doll-5 {
+  top: 45%;
+  left: 82%;
+  animation-delay: 8s;
+}
+
+@keyframes floatDoll {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+
+  25% {
+    transform: translateY(-15px) rotate(5deg) scale(1.05);
+  }
+
+  50% {
+    transform: translateY(-5px) rotate(-3deg) scale(0.95);
+  }
+
+  75% {
+    transform: translateY(-20px) rotate(4deg) scale(1.02);
+  }
 }
 
 
@@ -350,7 +504,6 @@ body {
 .external-ui {
   position: absolute;
   top: 30px;
-  /* Floating at the top */
   left: 0;
   width: 100%;
   display: flex;
@@ -362,7 +515,6 @@ body {
 .timer-display {
   font-family: 'Fredoka One', cursive;
   font-size: 2.2rem;
-  /* Bigger and bolder */
   color: #fff;
   background: linear-gradient(135deg, #ff477e 0%, #ff85a2 100%);
   padding: 12px 45px;
@@ -385,7 +537,6 @@ body {
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
 }
 
-
 /* 4. Score Display */
 .overlay-score {
   position: absolute;
@@ -399,29 +550,6 @@ body {
   font-size: 2.5rem;
   color: #ff477e;
   text-shadow: 2px 2px 0 #000;
-}
-
-.key-hints {
-  position: absolute;
-  bottom: 20px;
-  display: flex;
-  gap: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.key-hint {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.key-hint kbd {
-  background: #fff;
-  border: 2px solid #000;
-  border-radius: 4px;
-  padding: 1px 6px;
-  box-shadow: 1px 1px 0 #000;
 }
 
 /* ===== MISC GAME ELEMENTS ===== */
@@ -463,7 +591,8 @@ body {
 
 /* Key Hints */
 .key-hints {
-  margin-top: 50px;
+  position: absolute;
+  bottom: 20px;
   display: flex;
   gap: 20px;
   font-size: 0.8rem;
@@ -488,14 +617,9 @@ body {
   font-size: 0.8rem;
 }
 
-.chute-items canvas {
-  background: transparent !important;
-}
-
-
 
 /* ================================================================
-   FINALE — Same Postcard Aesthetic
+   FINALE — Premium Dark Rose Glassmorphic
    ================================================================ */
 #finale {
   position: fixed;
@@ -505,7 +629,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #b8243c;
+  background: linear-gradient(135deg, #fff0f3 0%, #fde2e4 40%, #ffc2d1 100%);
   opacity: 0;
   transition: opacity 1.5s ease;
 }
@@ -519,43 +643,118 @@ body {
 }
 
 .postcard-finale .postcard-inner {
-  padding: 60px 48px;
+  padding: 52px 44px 40px;
+}
+
+/* Finale eyebrow */
+.finale-eyebrow {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #ff477e;
+  opacity: 0.7;
+  margin-bottom: 16px;
 }
 
 .finale-title {
-  font-family: 'Satisfy', cursive;
-  font-size: clamp(2rem, 6vw, 3.2rem);
-  color: #b8243c;
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(2.2rem, 6vw, 3.2rem);
+  background: linear-gradient(135deg, #ff477e, #ff85a2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1.3;
   margin-bottom: 16px;
 }
 
-.finale-subtitle {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1.15rem;
-  color: #7a3a4a;
-  margin-bottom: 24px;
+/* Finale doll gallery */
+.finale-doll-gallery {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
 }
 
-.finale-divider {
-  font-size: 1.6rem;
-  color: #b8243c;
+.finale-doll {
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  animation: dollBob 3s ease-in-out infinite;
+  filter: drop-shadow(0 6px 12px rgba(255, 71, 126, 0.4));
+  transition: transform 0.3s ease;
+}
+
+.finale-doll:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.finale-doll:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.finale-doll:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.finale-doll:nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+.finale-doll:hover {
+  transform: scale(1.2) rotate(5deg);
+}
+
+.finale-subtitle {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: 1.15rem;
+  color: #4a1525;
   margin-bottom: 24px;
+  opacity: 0.9;
+}
+
+/* Love note container */
+.finale-love-note {
+  margin: 8px 0 28px;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.love-note-line {
+  width: 60%;
+  height: 2px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, #ff85a2, transparent);
   opacity: 0.5;
 }
 
 .finale-love {
   font-family: 'Satisfy', cursive;
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  color: #b8243c;
-  margin-bottom: 8px;
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: #ff477e;
+  margin: 20px 0 12px;
+}
+
+
+
+/* Finale signoff */
+.finale-signoff {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  color: #c4365a;
+  opacity: 0.85;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
 }
 
 .finale-hearts {
-  font-size: 2.4rem;
-  color: #b8243c;
+  font-size: 1.8rem;
+  color: #ff477e;
   margin: 16px 0 32px;
+  letter-spacing: 8px;
   animation: gentlePulse 2s ease-in-out infinite;
 }
 
@@ -567,29 +766,30 @@ body {
   }
 
   50% {
-    transform: scale(1.2);
+    transform: scale(1.15);
   }
 }
 
+/* Restart button — matches play button */
 .restart-btn {
   display: inline-block;
-  padding: 13px 44px;
-  background: #b8243c;
+  padding: 14px 44px;
+  background: linear-gradient(135deg, #ff477e, #ff85a2);
   border: none;
-  color: #faf3ed;
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 700;
-  font-size: 0.95rem;
+  color: #fff;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.9rem;
   letter-spacing: 3px;
   text-transform: uppercase;
   cursor: pointer;
+  border-radius: 50px;
   transition: all 0.3s ease;
+  box-shadow: 0 6px 24px rgba(255, 71, 126, 0.35);
 }
 
 .restart-btn:hover {
-  background: #9a1e33;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(184, 36, 60, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 35px rgba(255, 71, 126, 0.55);
 }
 
 /* ================================================================
@@ -600,14 +800,15 @@ body {
     padding: 44px 24px 36px;
   }
 
-  .postcard-top-left,
-  .postcard-top-right {
-    display: none;
+  .postcard-footer-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
   }
 
   .postcard-footer-left,
   .postcard-footer-right {
-    display: none;
+    text-align: center;
   }
 
   .star {
@@ -636,5 +837,15 @@ body {
 
   .postcard-finale .postcard-inner {
     padding: 44px 24px;
+  }
+
+  .doll-preview {
+    width: 40px;
+    height: 40px;
+  }
+
+  .finale-doll {
+    width: 44px;
+    height: 44px;
   }
 }
