@@ -10,10 +10,17 @@ let grabbedItem = null, clawOpen = 1, clawAnimFrame = 0;
 let keysPressed = {};
 let VW = 460, VH = 350;
 let viewportEl;
+let faceImages = [];
+for (let i = 1; i <= 5; i++) {
+  let img = new Image();
+  img.src = `face${i}.png`;
+  faceImages.push(img);
+}
+
 
 const CLAW_Y_TOP = 40;
 const CLAW_SPEED = 3.5;
-const GRAB_RADIUS = 36;
+const GRAB_RADIUS = 55;
 const SEPARATOR_X_RATIO = 0.18;
 
 // ===== AUDIO ENGINE =====
@@ -195,11 +202,11 @@ function spawnItems(sepX) {
   for (let i = 0; i < 5; i++) {
     const x = startX + Math.random() * (endX - startX);
     const y = startY + Math.random() * 60 - 80;
-    const body = Bodies.circle(x, y, 18, {
+    const body = Bodies.circle(x, y, 28, {
       restitution: 0.35, friction: 0.4, density: 0.003,
       render: { visible: false }, label: 'minime'
     });
-    items.push({ body, type: 'minime', radius: 18, caught: false });
+    items.push({ body, type: 'minime', radius: 28, caught: false, img: faceImages[i % faceImages.length] });
     Composite.add(engine.world, body);
   }
 }
@@ -323,7 +330,7 @@ function tryGrab() {
 }
 
 // ===== CREATE CANVAS ICON FOR AN ITEM =====
-function createItemCanvas(type, size) {
+function createItemCanvas(type, size, img) {
   const canvas = document.createElement('canvas');
   const s = size || 36;
   canvas.width = s;
@@ -331,9 +338,9 @@ function createItemCanvas(type, size) {
   const ctx = canvas.getContext('2d');
   ctx.translate(s / 2, s / 2);
   if (type === 'heart') {
-    drawHeart(ctx, 0, 0, s * 0.38);
+    drawHeart(ctx, 0, 0, s * 0.55);
   } else {
-    drawMiniMe(ctx, 0, 0, s * 0.38);
+    drawMiniMe(ctx, 0, 0, s * 0.5, img);
   }
   return canvas;
 }
@@ -344,12 +351,13 @@ function animateDropToChute(item) {
   const chuteEl = document.querySelector('.prize-chute');
   const chuteRect = chuteEl.getBoundingClientRect();
 
-  const iconCanvas = createItemCanvas(item.type, 40);
+  const size = item.radius * 2;
+  const iconCanvas = createItemCanvas(item.type, size, item.img);
   iconCanvas.style.cssText = `
     position: fixed;
     z-index: 200;
     pointer-events: none;
-    left: ${vpRect.left + clawX - 20}px;
+    left: ${vpRect.left + clawX - item.radius}px;
     top: ${vpRect.top + clawCurrentY + 10}px;
     transition: all 0.55s cubic-bezier(0.4, 0, 0.65, 1);
   `;
@@ -358,9 +366,8 @@ function animateDropToChute(item) {
   // Animate to chute center
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      iconCanvas.style.left = `${chuteRect.left + chuteRect.width / 2 - 20}px`;
+      iconCanvas.style.left = `${chuteRect.left + chuteRect.width / 2 - item.radius}px`;
       iconCanvas.style.top = `${chuteRect.top + chuteRect.height * 0.6}px`;
-      iconCanvas.style.transform = 'scale(0.7)';
       iconCanvas.style.opacity = '0.85';
     });
   });
@@ -376,7 +383,8 @@ function collectItem(item) {
   const chuteItems = document.querySelector('.chute-items');
   const wrapper = document.createElement('div');
   wrapper.className = 'chute-item';
-  const icon = createItemCanvas(item.type, 32);
+  const size = Math.max(36, item.radius * 1.5);
+  const icon = createItemCanvas(item.type, size, item.img);
   wrapper.appendChild(icon);
   chuteItems.appendChild(wrapper);
 
@@ -478,7 +486,7 @@ function customDraw() {
     ctx.translate(pos.x, pos.y);
     ctx.rotate(item.body.angle);
     if (item.type === 'heart') drawHeart(ctx, 0, 0, item.radius * 1.1);
-    else drawMiniMe(ctx, 0, 0, item.radius);
+    else drawMiniMe(ctx, 0, 0, item.radius, item.img);
     ctx.restore();
   }
 
@@ -514,35 +522,35 @@ function drawHeart(ctx, x, y, size) {
   ctx.restore();
 }
 
-function drawMiniMe(ctx, x, y, r) {
-  ctx.save(); ctx.translate(x, y);
-  const grad = ctx.createRadialGradient(0, -2, 2, 0, 0, r);
-  grad.addColorStop(0, '#ffe8b0'); grad.addColorStop(1, '#f4c87a');
-  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
-  ctx.fillStyle = grad; ctx.fill();
-  ctx.strokeStyle = '#c4943a'; ctx.lineWidth = 2.5; ctx.stroke();
-  // Eyes
-  ctx.fillStyle = '#333';
-  ctx.beginPath(); ctx.arc(-5, -3, 2.5, 0, Math.PI * 2); ctx.arc(5, -3, 2.5, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.beginPath(); ctx.arc(-4, -4, 1, 0, Math.PI * 2); ctx.arc(6, -4, 1, 0, Math.PI * 2); ctx.fill();
-  // Smile
-  ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.arc(0, 1, 6, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
-  // Blush
-  ctx.fillStyle = 'rgba(255,130,140,0.4)';
-  ctx.beginPath(); ctx.ellipse(-8, 3, 3, 2, 0, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(8, 3, 3, 2, 0, 0, Math.PI * 2); ctx.fill();
-  // Sunglasses
-  ctx.strokeStyle = '#222'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(-10, -4); ctx.lineTo(10, -4); ctx.stroke();
-  ctx.fillStyle = 'rgba(30,30,30,0.7)';
-  ctx.fillRect(-9, -6, 8, 5); ctx.fillRect(1, -6, 8, 5);
-  ctx.strokeRect(-9, -6, 8, 5); ctx.strokeRect(1, -6, 8, 5);
-  // Label
-  ctx.fillStyle = '#c45a7a'; ctx.font = 'bold 7px Outfit'; ctx.textAlign = 'center';
-  ctx.fillText('ME', 0, r + 2);
-  ctx.restore();
+function drawMiniMe(ctx, x, y, r, img) {
+  const displayImg = img || faceImages[0];
+  if (displayImg && displayImg.complete && displayImg.naturalWidth !== 0) {
+    ctx.drawImage(displayImg, x - r, y - r, r * 2, r * 2);
+  } else {
+    // Fallback if image fails to load
+    ctx.save(); ctx.translate(x, y);
+    const grad = ctx.createRadialGradient(0, -2, 2, 0, 0, r);
+    grad.addColorStop(0, '#ffe8b0'); grad.addColorStop(1, '#f4c87a');
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fillStyle = grad; ctx.fill();
+    ctx.strokeStyle = '#c4943a'; ctx.lineWidth = 2.5; ctx.stroke();
+    // Eyes
+    ctx.fillStyle = '#333';
+    ctx.beginPath(); ctx.arc(-5, -3, 2.5, 0, Math.PI * 2); ctx.arc(5, -3, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-4, -4, 1, 0, Math.PI * 2); ctx.arc(6, -4, 1, 0, Math.PI * 2); ctx.fill();
+    // Smile
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(0, 1, 6, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+    // Blush
+    ctx.fillStyle = 'rgba(255,130,140,0.4)';
+    ctx.beginPath(); ctx.ellipse(-8, 3, 3, 2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(8, 3, 3, 2, 0, 0, Math.PI * 2); ctx.fill();
+    // Label
+    ctx.fillStyle = '#c45a7a'; ctx.font = 'bold 7px Outfit'; ctx.textAlign = 'center';
+    ctx.fillText('ME', 0, r + 2);
+    ctx.restore();
+  }
 }
 
 function drawClaw(ctx, x, y, openness) {
