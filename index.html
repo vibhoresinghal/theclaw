@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Valentine's Day, Rupali ❤️</title>
+    <meta name="description" content="A Valentine's Day Claw Machine game for Rupali">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+</head>
+
+<body>
+
+    <!-- ============ PHASE 1: LANDING ============ -->
+    <div id="landing">
+        <div class="hearts-bg"></div>
+        <div class="landing-content">
+            <h1>Happy Valentine's Day, <span>Rupali</span> ❤️</h1>
+            <p>I'm a man of many moods and many versions, but every single one of them is yours. Can you catch them all
+                before time runs out?</p>
+            <button class="play-btn" onclick="startGame()">
+                🎮 LET'S PLAY
+            </button>
+        </div>
+    </div>
+
+    <!-- ============ PHASE 2-3: GAME ============ -->
+    <div id="game-screen">
+        <div class="machine-wrapper">
+
+            <!-- Crown -->
+            <div class="machine-crown">
+                <div class="crown-shape">
+                    <span class="crown-heart">💖</span>
+                </div>
+            </div>
+
+            <!-- Wings -->
+            <span class="wing wing-left">🪽</span>
+            <span class="wing wing-right">🪽</span>
+
+            <!-- Machine Frame -->
+            <div class="machine-frame">
+                <!-- Sign -->
+                <div class="machine-sign">💖 CATCH MY HEART 💖</div>
+
+                <!-- Bulbs -->
+                <div class="bulbs bulbs-left">
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                </div>
+                <div class="bulbs bulbs-right">
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                    <div class="bulb"></div>
+                </div>
+
+                <!-- Glass Viewport -->
+                <div class="glass-viewport">
+                    <canvas id="game-canvas"></canvas>
+                    <div class="glass-shine"></div>
+                </div>
+
+                <!-- Timer -->
+                <div class="timer-panel">
+                    <div id="timer-display" class="timer-display">0:60</div>
+                </div>
+
+                <!-- Control Panel -->
+                <div class="control-panel">
+                    <div class="joystick-base">
+                        <div class="joystick-stick"></div>
+                    </div>
+                    <div class="ctrl-btn">PLAY</div>
+                </div>
+
+                <!-- Prize Chute -->
+                <div class="prize-chute">
+                    <div class="chute-label">PRIZE OUT</div>
+                    <div class="chute-items"></div>
+                </div>
+
+                <!-- Score Panel -->
+                <div class="score-panel">
+                    <div class="score-label">ME's CAUGHT</div>
+                    <div id="score-value" class="score-value">0</div>
+                    <div class="score-sub">/ 5</div>
+                </div>
+            </div>
+
+            <!-- Key Hints -->
+            <div class="key-hints">
+                <div class="key-hint"><kbd>←</kbd><kbd>→</kbd> Move</div>
+                <div class="key-hint"><kbd>Space</kbd> Grab / Drop</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ PHASE 4: FINALE ============ -->
+    <div id="finale">
+        <div class="hearts-bg"></div>
+        <h2>No matter which version of me you catch, you've already won my heart.<br><br>I love you, <span>Rupali</span>
+            ❤️</h2>
+        <div class="finale-hearts">💕 💖 💗 💘 💝</div>
+        <button class="restart-btn" onclick="restartGame()">🔄 PLAY AGAIN</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+
+</html>
