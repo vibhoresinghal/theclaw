@@ -21,7 +21,7 @@ for (let i = 1; i <= 5; i++) {
 const CLAW_Y_TOP = 40;
 const CLAW_SPEED = 3.5;
 const GRAB_RADIUS = 55;
-const SEPARATOR_X_RATIO = 0.18;
+const SEPARATOR_X_RATIO = 0.54;
 
 // ===== AUDIO ENGINE =====
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -153,17 +153,17 @@ function initPhysics() {
     Bodies.rectangle(VW / 2, VH + 15, VW, 30, wallOpts),
     Bodies.rectangle(-15, VH / 2, 30, VH, wallOpts),
     Bodies.rectangle(VW + 15, VH / 2, 30, VH, wallOpts),
-    // Separator wall — from bottom up to 55% height, leaves gap at top for claw
+    // Separator wall
     Bodies.rectangle(sepX, VH - (VH * 0.45) / 2, 6, VH * 0.45, {
       isStatic: true,
-      render: { fillStyle: '#d4809a', strokeStyle: '#c0607a', lineWidth: 2 },
+      render: { fillStyle: '#ff85a1', strokeStyle: '#000', lineWidth: 2 },
       chamfer: { radius: 3 },
       label: 'separator'
     }),
-    // Small angled ramp in chute zone to guide items down
+    // Small angled ramp
     Bodies.rectangle(sepX / 2 - 5, VH * 0.52, sepX - 10, 5, {
       isStatic: true, angle: 0.15,
-      render: { fillStyle: '#d4809a', strokeStyle: '#c0607a', lineWidth: 1 },
+      render: { fillStyle: '#ff85a1', strokeStyle: '#000', lineWidth: 1 },
       label: 'ramp'
     }),
   ]);
@@ -450,30 +450,30 @@ function customDraw() {
 
   ctx.save();
 
-  // Draw chute zone label
-  ctx.fillStyle = 'rgba(212, 128, 154, 0.15)';
-  ctx.fillRect(0, 0, sepX - 3, VH);
-  ctx.fillStyle = '#d4809a';
-  ctx.font = 'bold 9px Outfit';
+  // Chute zone indicator - very subtle
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+  ctx.fillRect(0, 0, sepX, VH);
+
+  // Arrow pointing down
+  ctx.fillStyle = '#ff477e';
+  ctx.font = 'bold 20px Fredoka One';
   ctx.textAlign = 'center';
-  ctx.save();
-  ctx.translate(sepX / 2, VH / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillText('⬇ DROP HERE ⬇', 0, 0);
-  ctx.restore();
+  ctx.fillText('▼', sepX / 2, VH * 0.25);
+  ctx.font = '12px Fredoka One';
+  ctx.fillText('DROP', sepX / 2, VH * 0.15);
 
   // Arrow pointing down in chute zone
   if (gameState === 'holding' && clawX < sepX + 10) {
-    ctx.fillStyle = 'rgba(255,77,109,0.3)';
+    ctx.fillStyle = 'rgba(255, 71, 126, 0.2)';
     ctx.font = '24px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('⬇', sepX / 2, VH - 20);
   }
 
   // Claw rope
-  ctx.strokeStyle = '#999';
-  ctx.lineWidth = 2.5;
-  ctx.setLineDash([4, 3]);
+  // Draw Rope - Pinkish/White
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+  ctx.setLineDash([5, 5]); // Cute dashed rope
   ctx.beginPath(); ctx.moveTo(clawX, 0); ctx.lineTo(clawX, clawCurrentY); ctx.stroke();
   ctx.setLineDash([]);
 
@@ -492,7 +492,7 @@ function customDraw() {
 
   // Highlight grab zone when dropping
   if (gameState === 'dropping' || gameState === 'grabbing') {
-    ctx.strokeStyle = 'rgba(255,77,109,0.4)';
+    ctx.strokeStyle = 'rgba(58,42,26,0.35)';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -516,7 +516,7 @@ function drawHeart(ctx, x, y, size) {
   const grad = ctx.createRadialGradient(0, 8, 2, 0, 8, 20);
   grad.addColorStop(0, '#ff6b8a'); grad.addColorStop(1, '#cc2244');
   ctx.fillStyle = grad; ctx.fill();
-  ctx.strokeStyle = '#a01030'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
   ctx.beginPath(); ctx.arc(-5, 2, 3, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
   ctx.restore();
@@ -524,53 +524,44 @@ function drawHeart(ctx, x, y, size) {
 
 function drawMiniMe(ctx, x, y, r, img) {
   const displayImg = img || faceImages[0];
+  ctx.save();
   if (displayImg && displayImg.complete && displayImg.naturalWidth !== 0) {
     ctx.drawImage(displayImg, x - r, y - r, r * 2, r * 2);
   } else {
-    // Fallback if image fails to load
-    ctx.save(); ctx.translate(x, y);
+    // Fallback logic
     const grad = ctx.createRadialGradient(0, -2, 2, 0, 0, r);
     grad.addColorStop(0, '#ffe8b0'); grad.addColorStop(1, '#f4c87a');
-    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.translate(x, y); ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.fillStyle = grad; ctx.fill();
-    ctx.strokeStyle = '#c4943a'; ctx.lineWidth = 2.5; ctx.stroke();
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.stroke();
     // Eyes
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#000';
     ctx.beginPath(); ctx.arc(-5, -3, 2.5, 0, Math.PI * 2); ctx.arc(5, -3, 2.5, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(-4, -4, 1, 0, Math.PI * 2); ctx.arc(6, -4, 1, 0, Math.PI * 2); ctx.fill();
     // Smile
-    ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.arc(0, 1, 6, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
-    // Blush
-    ctx.fillStyle = 'rgba(255,130,140,0.4)';
-    ctx.beginPath(); ctx.ellipse(-8, 3, 3, 2, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(8, 3, 3, 2, 0, 0, Math.PI * 2); ctx.fill();
-    // Label
-    ctx.fillStyle = '#c45a7a'; ctx.font = 'bold 7px Outfit'; ctx.textAlign = 'center';
-    ctx.fillText('ME', 0, r + 2);
-    ctx.restore();
   }
+  ctx.restore();
 }
 
 function drawClaw(ctx, x, y, openness) {
   ctx.save(); ctx.translate(x, y);
-  ctx.fillStyle = '#bbb'; ctx.strokeStyle = '#888'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.roundRect(-12, -6, 24, 14, 4); ctx.fill(); ctx.stroke();
-  const angle = 0.15 + openness * 0.45;
-  // Left arm
+  ctx.fillStyle = '#ffebf1'; ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.roundRect(-15, -8, 30, 18, 5); ctx.fill(); ctx.stroke();
+  const angle = 0.2 + openness * 0.5;
+  // Arms - Soft pink
   ctx.save(); ctx.rotate(-angle);
-  ctx.fillStyle = '#ccc'; ctx.strokeStyle = '#999'; ctx.lineWidth = 2;
+  ctx.fillStyle = '#ffc2d1'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2.5;
   ctx.beginPath();
-  ctx.moveTo(-3, 6); ctx.lineTo(-6, 30); ctx.lineTo(-10, 32);
-  ctx.lineTo(-8, 34); ctx.lineTo(0, 32); ctx.lineTo(3, 6);
+  ctx.moveTo(-4, 8); ctx.lineTo(-8, 35); ctx.lineTo(-14, 38);
+  ctx.lineTo(-12, 42); ctx.lineTo(0, 40); ctx.lineTo(4, 8);
   ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
-  // Right arm
+
   ctx.save(); ctx.rotate(angle);
-  ctx.fillStyle = '#ccc'; ctx.strokeStyle = '#999'; ctx.lineWidth = 2;
+  ctx.fillStyle = '#ffc2d1'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2.5;
   ctx.beginPath();
-  ctx.moveTo(3, 6); ctx.lineTo(6, 30); ctx.lineTo(10, 32);
-  ctx.lineTo(8, 34); ctx.lineTo(0, 32); ctx.lineTo(-3, 6);
+  ctx.moveTo(4, 8); ctx.lineTo(8, 35); ctx.lineTo(14, 38);
+  ctx.lineTo(12, 42); ctx.lineTo(0, 40); ctx.lineTo(-4, 8);
   ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
   ctx.restore();
 }

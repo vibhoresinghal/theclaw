@@ -7,6 +7,9 @@
     <title>Happy Valentine's Day, Rupali ❤️</title>
     <meta name="description" content="A Valentine's Day Claw Machine game for Rupali">
     <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Outfit:wght@400;700;900&family=Satisfy&family=Pacifico&display=swap"
+        rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 
@@ -42,82 +45,49 @@
 
     <!-- ============ PHASE 2-3: GAME ============ -->
     <div id="game-screen">
-        <div class="machine-wrapper">
+        <!-- The Custom Image Machine Wrapper -->
+        <div class="custom-machine-container">
+            <!-- Your SVG/PNG will go here -->
+            <img src="machine_frame.svg" class="machine-frame-img" id="machine-frame">
 
-            <!-- Crown -->
-            <div class="machine-crown">
-                <div class="crown-shape">
-                    <span class="crown-heart">💖</span>
+            <!-- INTERACTIVE OVERLAYS (Positioned precisely over the image) -->
+
+            <!-- 1. The Glass Window (Game Viewport) -->
+            <div class="glass-viewport">
+                <div class="viewport-grid"></div>
+                <canvas id="game-canvas"></canvas>
+                <div class="glass-shine"></div>
+            </div>
+
+            <!-- 2. The Prize Collection Box -->
+            <div class="prize-chute">
+                <div class="chute-items"></div>
+            </div>
+
+            <!-- 3. The Control Panel (Joystick, Buttons, Timer) -->
+            <div class="overlay-controls">
+                <div class="joystick-base">
+                    <div class="joystick-stick"></div>
+                </div>
+                <div class="control-right-stack">
+                    <div id="timer-display" class="timer-display">00:60</div>
+                    <div class="ctrl-green-btn"></div>
                 </div>
             </div>
 
-            <!-- Wings -->
-            <span class="wing wing-left">🪽</span>
-            <span class="wing wing-right">🪽</span>
-
-            <!-- Machine Frame -->
-            <div class="machine-frame">
-                <!-- Sign -->
-                <div class="machine-sign">💖 CATCH MY HEART 💖</div>
-
-                <!-- Bulbs -->
-                <div class="bulbs bulbs-left">
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                </div>
-                <div class="bulbs bulbs-right">
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                    <div class="bulb"></div>
-                </div>
-
-                <!-- Glass Viewport -->
-                <div class="glass-viewport">
-                    <canvas id="game-canvas"></canvas>
-                    <div class="glass-shine"></div>
-                </div>
-
-                <!-- Timer -->
-                <div class="timer-panel">
-                    <div id="timer-display" class="timer-display">0:60</div>
-                </div>
-
-                <!-- Control Panel -->
-                <div class="control-panel">
-                    <div class="joystick-base">
-                        <div class="joystick-stick"></div>
-                    </div>
-                    <div class="ctrl-btn">PLAY</div>
-                </div>
-
-                <!-- Prize Chute -->
-                <div class="prize-chute">
-                    <div class="chute-label">PRIZE OUT</div>
-                    <div class="chute-items"></div>
-                </div>
-
-                <!-- Score Panel -->
-                <div class="score-panel">
-                    <div class="score-label">ME's CAUGHT</div>
-                    <div id="score-value" class="score-value">0</div>
-                    <div class="score-sub">/ 5</div>
-                </div>
-            </div>
-
-            <!-- Key Hints -->
-            <div class="key-hints">
-                <div class="key-hint"><kbd>←</kbd><kbd>→</kbd> Move</div>
-                <div class="key-hint"><kbd>Space</kbd> Grab / Drop</div>
+            <!-- 4. The Score Overlay -->
+            <div class="overlay-score">
+                <div id="score-value" class="score-value">0</div>
             </div>
         </div>
+
+        <!-- Key Hints (Optional placement) -->
+        <div class="key-hints">
+            <div class="key-hint"><kbd>←</kbd><kbd>→</kbd> Move</div>
+            <div class="key-hint"><kbd>Space</kbd> Catch</div>
+        </div>
     </div>
+
 
     <!-- ============ PHASE 4: FINALE ============ -->
     <div id="finale">
