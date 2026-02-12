@@ -15,13 +15,28 @@
     <!-- ============ PHASE 1: LANDING ============ -->
     <div id="landing">
         <div class="hearts-bg"></div>
-        <div class="landing-content">
-            <h1>Happy Valentine's Day, <span>Rupali</span> ❤️</h1>
-            <p>I'm a man of many moods and many versions, but every single one of them is yours. Can you catch them all
-                before time runs out?</p>
-            <button class="play-btn" onclick="startGame()">
-                🎮 LET'S PLAY
-            </button>
+        <div class="postcard">
+            <!-- Decorative corner flourishes -->
+            <div class="postcard-inner">
+                <div class="star star-tl">✦</div>
+                <div class="star star-tr">✦</div>
+                <div class="star star-bl">✦</div>
+                <div class="star star-br">✦</div>
+
+                <p class="postcard-top-left">A little game,<br>made with love</p>
+                <p class="postcard-top-right">For the one who<br>has my heart</p>
+
+                <h1 class="postcard-title">Happy<br>Valentine's</h1>
+                <p class="postcard-subtitle">— Rupali —</p>
+
+                <p class="postcard-body">I'm a man of many moods & many versions,<br>but every single one of them is
+                    yours.<br>Can you catch them all?</p>
+
+                <button class="play-btn" onclick="startGame()">LET'S PLAY</button>
+
+                <p class="postcard-footer-left">Use arrow keys<br>to catch 'em all</p>
+                <p class="postcard-footer-right">Feb 14, 2026<br>❤️</p>
+            </div>
         </div>
     </div>
 
@@ -107,10 +122,21 @@
     <!-- ============ PHASE 4: FINALE ============ -->
     <div id="finale">
         <div class="hearts-bg"></div>
-        <h2>No matter which version of me you catch, you've already won my heart.<br><br>I love you, <span>Rupali</span>
-            ❤️</h2>
-        <div class="finale-hearts">💕 💖 💗 💘 💝</div>
-        <button class="restart-btn" onclick="restartGame()">🔄 PLAY AGAIN</button>
+        <div class="postcard postcard-finale">
+            <div class="postcard-inner">
+                <div class="star star-tl">✦</div>
+                <div class="star star-tr">✦</div>
+                <div class="star star-bl">✦</div>
+                <div class="star star-br">✦</div>
+
+                <h2 class="finale-title">No matter which<br>version of me<br>you catch…</h2>
+                <p class="finale-subtitle">you've already won my heart.</p>
+                <div class="finale-divider">❦</div>
+                <p class="finale-love">I love you, Rupali</p>
+                <div class="finale-hearts">♥</div>
+                <button class="restart-btn" onclick="restartGame()">PLAY AGAIN</button>
+            </div>
+        </div>
     </div>
 
     <script src="game.js"></script>

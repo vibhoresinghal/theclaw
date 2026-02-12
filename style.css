@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Fredoka+One&family=Outfit:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Satisfy&family=Outfit:wght@300;400;600;700&family=Fredoka+One&display=swap');
 
 * {
   margin: 0;
@@ -11,28 +11,30 @@ body {
   height: 100vh;
   overflow: hidden;
   font-family: 'Outfit', sans-serif;
-  background: #fce4ec;
+  background: #b8243c;
 }
 
-/* ===== LANDING PAGE — Soft Pink Kawaii ===== */
+/* ================================================================
+   LANDING PAGE — Vintage Cream Postcard on Deep Crimson
+   ================================================================ */
 #landing {
   position: fixed;
   inset: 0;
   z-index: 100;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at center, #fce4ec 0%, #f8bbd0 40%, #f48fb1 100%);
-  transition: opacity 1s ease, transform 1s ease;
+  background: #b8243c;
+  transition: opacity 1.2s ease, transform 1.2s ease;
 }
 
 #landing.hidden {
   opacity: 0;
-  transform: scale(1.05);
+  transform: scale(1.04);
   pointer-events: none;
 }
 
+/* Floating hearts background */
 .hearts-bg {
   position: absolute;
   inset: 0;
@@ -43,9 +45,9 @@ body {
 .float-heart {
   position: absolute;
   font-size: 24px;
-  opacity: 0.25;
+  opacity: 0.15;
   animation: floatUp linear infinite;
-  color: #e91e63;
+  color: #e8a0b0;
 }
 
 @keyframes floatUp {
@@ -55,11 +57,11 @@ body {
   }
 
   10% {
-    opacity: 0.25;
+    opacity: 0.12;
   }
 
   90% {
-    opacity: 0.15;
+    opacity: 0.08;
   }
 
   100% {
@@ -68,81 +70,184 @@ body {
   }
 }
 
-.landing-content {
-  text-align: center;
+/* === THE POSTCARD === */
+.postcard {
+  position: relative;
   z-index: 2;
-  padding: 20px;
-  animation: fadeInUp 1.5s ease-out;
+  width: min(480px, 88vw);
+  animation: cardIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes fadeInUp {
+@keyframes cardIn {
   from {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(60px) rotate(-2deg) scale(0.92);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) rotate(0deg) scale(1);
   }
 }
 
-.landing-content h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2.2rem, 6vw, 4.5rem);
-  color: #880e4f;
-  text-shadow: 0 2px 20px rgba(233, 30, 99, 0.2);
-  margin-bottom: 24px;
-  line-height: 1.2;
+/* Stamp-edge perforated border */
+.postcard::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  /* Scalloped border effect using radial gradient */
+  background: var(--stamp-bg, #b8243c);
+  mask-image: radial-gradient(circle 6px at 12px 6px, transparent 5px, black 5.5px);
+  -webkit-mask-image: radial-gradient(circle 6px at 12px 6px, transparent 5px, black 5.5px);
+  mask-size: 24px 100%;
+  -webkit-mask-size: 24px 100%;
+  mask-repeat: repeat;
+  -webkit-mask-repeat: repeat;
+  z-index: -1;
+  border-radius: 4px;
 }
 
-.landing-content h1 span {
-  color: #c2185b;
+.postcard-inner {
+  position: relative;
+  background: #faf3ed;
+  padding: 52px 40px 44px;
+  /* Real paper texture via subtle noise */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  border: 2px solid #e8c8b8;
+  text-align: center;
 }
 
-.landing-content p {
-  font-size: clamp(0.9rem, 2.2vw, 1.15rem);
-  color: #6a1b4d;
-  max-width: 560px;
-  margin: 0 auto 48px;
-  line-height: 1.7;
-  font-weight: 300;
+/* Decorative stars */
+.star {
+  position: absolute;
+  color: #b8243c;
+  font-size: 18px;
+  line-height: 1;
 }
 
+.star-tl {
+  top: 18px;
+  left: 22px;
+}
+
+.star-tr {
+  top: 18px;
+  right: 22px;
+}
+
+.star-bl {
+  bottom: 18px;
+  left: 22px;
+}
+
+.star-br {
+  bottom: 18px;
+  right: 22px;
+}
+
+/* Top corner captions */
+.postcard-top-left,
+.postcard-top-right {
+  position: absolute;
+  top: 20px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.78rem;
+  color: #b8243c;
+  line-height: 1.5;
+  opacity: 0.7;
+}
+
+.postcard-top-left {
+  left: 50px;
+  text-align: left;
+}
+
+.postcard-top-right {
+  right: 50px;
+  text-align: right;
+}
+
+/* Main title — elegant script */
+.postcard-title {
+  font-family: 'Satisfy', cursive;
+  font-size: clamp(2.8rem, 9vw, 4.4rem);
+  color: #b8243c;
+  line-height: 1.15;
+  margin: 30px 0 8px;
+  letter-spacing: -0.5px;
+}
+
+.postcard-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  color: #b8243c;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  font-weight: 400;
+}
+
+.postcard-body {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: #7a3a4a;
+  line-height: 1.9;
+  margin-bottom: 36px;
+  opacity: 0.85;
+}
+
+/* Play button — solid crimson, understated elegance */
 .play-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 18px 48px;
-  background: linear-gradient(135deg, #ec407a, #f48fb1);
+  display: inline-block;
+  padding: 15px 52px;
+  background: #b8243c;
   border: none;
-  border-radius: 60px;
-  color: #fff;
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.3rem;
+  color: #faf3ed;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 8px 32px rgba(233, 30, 99, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  animation: pulse 2s ease-in-out infinite;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .play-btn:hover {
-  transform: scale(1.08);
+  background: #9a1e33;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(184, 36, 60, 0.3);
 }
 
-@keyframes pulse {
-
-  0%,
-  100% {
-    box-shadow: 0 8px 32px rgba(233, 30, 99, 0.35);
-  }
-
-  50% {
-    box-shadow: 0 8px 48px rgba(233, 30, 99, 0.6), 0 0 60px rgba(233, 30, 99, 0.2);
-  }
+/* Footer text */
+.postcard-footer-left,
+.postcard-footer-right {
+  position: absolute;
+  bottom: 16px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.72rem;
+  color: #b8243c;
+  line-height: 1.5;
+  opacity: 0.6;
 }
 
-/* ===== GAME SCREEN — Soft Pastel Pink ===== */
+.postcard-footer-left {
+  left: 50px;
+  text-align: left;
+}
+
+.postcard-footer-right {
+  right: 50px;
+  text-align: right;
+}
+
+
+/* ================================================================
+   GAME SCREEN
+   ================================================================ */
 #game-screen {
   position: fixed;
   inset: 0;
@@ -506,79 +611,6 @@ body {
   }
 }
 
-/* ===== FINALE — Soft Pink ===== */
-#finale {
-  position: fixed;
-  inset: 0;
-  z-index: 150;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(ellipse, #fce4ec 0%, #f8bbd0 50%, #f48fb1 100%);
-  opacity: 0;
-  transition: opacity 1.5s ease;
-  text-align: center;
-  padding: 20px;
-}
-
-#finale.active {
-  display: flex;
-}
-
-#finale.visible {
-  opacity: 1;
-}
-
-#finale h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.4rem, 4vw, 2.8rem);
-  color: #880e4f;
-  line-height: 1.5;
-  max-width: 600px;
-  text-shadow: 0 2px 15px rgba(233, 30, 99, 0.15);
-}
-
-#finale h2 span {
-  color: #c2185b;
-}
-
-.finale-hearts {
-  margin-top: 24px;
-  font-size: 2rem;
-  animation: gentlePulse 2s ease-in-out infinite;
-}
-
-@keyframes gentlePulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.15);
-  }
-}
-
-.restart-btn {
-  margin-top: 36px;
-  padding: 14px 40px;
-  background: linear-gradient(135deg, #ec407a, #f48fb1);
-  border: none;
-  border-radius: 50px;
-  color: #fff;
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.1rem;
-  cursor: pointer;
-  box-shadow: 0 6px 24px rgba(233, 30, 99, 0.3);
-  transition: transform 0.2s;
-}
-
-.restart-btn:hover {
-  transform: scale(1.08);
-}
-
 .key-hints {
   position: absolute;
   bottom: 8px;
@@ -603,4 +635,150 @@ body {
   padding: 2px 6px;
   font-family: inherit;
   font-size: 0.6rem;
+}
+
+
+/* ================================================================
+   FINALE — Same Postcard Aesthetic
+   ================================================================ */
+#finale {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #b8243c;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+#finale.active {
+  display: flex;
+}
+
+#finale.visible {
+  opacity: 1;
+}
+
+.postcard-finale .postcard-inner {
+  padding: 60px 48px;
+}
+
+.finale-title {
+  font-family: 'Satisfy', cursive;
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  color: #b8243c;
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+
+.finale-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: #7a3a4a;
+  margin-bottom: 24px;
+}
+
+.finale-divider {
+  font-size: 1.6rem;
+  color: #b8243c;
+  margin-bottom: 24px;
+  opacity: 0.5;
+}
+
+.finale-love {
+  font-family: 'Satisfy', cursive;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: #b8243c;
+  margin-bottom: 8px;
+}
+
+.finale-hearts {
+  font-size: 2.4rem;
+  color: #b8243c;
+  margin: 16px 0 32px;
+  animation: gentlePulse 2s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.restart-btn {
+  display: inline-block;
+  padding: 13px 44px;
+  background: #b8243c;
+  border: none;
+  color: #faf3ed;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.restart-btn:hover {
+  background: #9a1e33;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(184, 36, 60, 0.3);
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 520px) {
+  .postcard-inner {
+    padding: 44px 24px 36px;
+  }
+
+  .postcard-top-left,
+  .postcard-top-right {
+    display: none;
+  }
+
+  .postcard-footer-left,
+  .postcard-footer-right {
+    display: none;
+  }
+
+  .star {
+    font-size: 14px;
+  }
+
+  .star-tl {
+    top: 14px;
+    left: 16px;
+  }
+
+  .star-tr {
+    top: 14px;
+    right: 16px;
+  }
+
+  .star-bl {
+    bottom: 14px;
+    left: 16px;
+  }
+
+  .star-br {
+    bottom: 14px;
+    right: 16px;
+  }
+
+  .postcard-finale .postcard-inner {
+    padding: 44px 24px;
+  }
 }
