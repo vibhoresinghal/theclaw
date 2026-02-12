@@ -266,9 +266,8 @@ body {
 .custom-machine-container {
   position: relative;
   width: min(555px, 95vw);
-  /* Updated to new SVG width */
-  aspect-ratio: 555 / 799;
-  /* Updated to new SVG dimensions */
+  /* Updated for new SVG height */
+  aspect-ratio: 555 / 884;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -284,17 +283,17 @@ body {
   z-index: 1;
 }
 
-/* 1. Viewport (The Glass Window) */
+/* 1. Viewport (The Glass Window) - Lowered to match SVG */
 .glass-viewport {
   position: absolute;
-  top: 14.95%;
+  top: 23.13%;
   left: 16.21%;
   width: 67.75%;
-  height: 39.17%;
-  border-radius: 15px;
+  height: 35.4%;
+  border-radius: 12px;
   overflow: hidden;
   z-index: 2;
-  background: rgba(254, 224, 236, 0.2);
+  background: rgba(254, 224, 236, 0.1);
 }
 
 .viewport-grid {
@@ -314,13 +313,13 @@ body {
   height: 100% !important;
 }
 
-/* 2. Prize Out Box (The Chute) */
+/* 2. Prize Out Box (The Chute) - Reverted to LEFT side */
 .prize-chute {
   position: absolute;
-  top: 76%;
+  top: 78.3%;
   left: 16.22%;
   width: 36.58%;
-  height: 16.9%;
+  height: 15.3%;
   border-radius: 15px;
   overflow: hidden;
   z-index: 2;
@@ -331,79 +330,61 @@ body {
 }
 
 .chute-items {
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 4px;
-  padding: 5px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#chute-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .chute-items canvas {
   background: transparent !important;
 }
 
-/* 3. Controls (Joystick & Button) */
-.overlay-controls {
+/* 3. External UI Elements (Premium Arcade Timer) */
+.external-ui {
   position: absolute;
-  top: 57.5%;
-  left: 45%;
-  width: 48%;
-  height: 11%;
-  z-index: 10;
-  /* Bring to very front */
+  top: 30px;
+  /* Floating at the top */
+  left: 0;
+  width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-around;
-  pointer-events: auto;
-}
-
-.joystick-base {
-  width: 50px;
-  height: 50px;
-  background: #ff477e;
-  border: 3px solid #000;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-}
-
-.joystick-stick {
-  width: 16px;
-  height: 16px;
-  background: #ff0000;
-  border: 2px solid #000;
-  border-radius: 50%;
-  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
-}
-
-.control-right-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  pointer-events: none;
+  z-index: 100;
 }
 
 .timer-display {
   font-family: 'Fredoka One', cursive;
-  font-size: 1.2rem;
-  color: #000;
-  background: #fff;
-  padding: 2px 8px;
-  border: 2px solid #000;
-  border-radius: 4px;
+  font-size: 2.2rem;
+  /* Bigger and bolder */
+  color: #fff;
+  background: linear-gradient(135deg, #ff477e 0%, #ff85a2 100%);
+  padding: 12px 45px;
+  border: 4px solid #fff;
+  border-radius: 80px;
+  box-shadow:
+    0 10px 30px rgba(255, 71, 126, 0.4),
+    inset 0 0 15px rgba(255, 255, 255, 0.4);
+  pointer-events: auto;
+  letter-spacing: 4px;
+  text-shadow: 2px 3px 0px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.ctrl-green-btn {
-  width: 35px;
-  height: 18px;
-  background: #4caf50;
-  border: 2px solid #000;
-  border-radius: 5px;
-  box-shadow: 0 3px 0 #000;
+.timer-display::before {
+  content: '⏳';
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
 }
+
 
 /* 4. Score Display */
 .overlay-score {

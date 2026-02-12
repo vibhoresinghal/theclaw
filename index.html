@@ -61,24 +61,20 @@
 
             <!-- 2. The Prize Collection Box -->
             <div class="prize-chute">
-                <div class="chute-items"></div>
-            </div>
-
-            <!-- 3. The Control Panel (Joystick, Buttons, Timer) -->
-            <div class="overlay-controls">
-                <div class="joystick-base">
-                    <div class="joystick-stick"></div>
-                </div>
-                <div class="control-right-stack">
-                    <div id="timer-display" class="timer-display">00:60</div>
-                    <div class="ctrl-green-btn"></div>
+                <div class="chute-items">
+                    <canvas id="chute-canvas"></canvas>
                 </div>
             </div>
 
-            <!-- 4. The Score Overlay -->
+            <!-- 3. The Score Overlay -->
             <div class="overlay-score">
                 <div id="score-value" class="score-value">0</div>
             </div>
+        </div>
+
+        <!-- External UI Elements (Outside Machine) -->
+        <div class="external-ui">
+            <div id="timer-display" class="timer-display">00:60</div>
         </div>
 
         <!-- Key Hints (Optional placement) -->

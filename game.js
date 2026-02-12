@@ -1,7 +1,9 @@
 const { Engine, Render, Runner, Bodies, Body, Composite, Events } = Matter;
 
 let engine, render, runner;
+let chuteEngine, chuteRender, chuteRunner;
 let items = [];
+let chuteItemsPhysics = [];
 let gameState = 'idle';
 let clawX = 0, clawCurrentY = 40;
 let gameTimer = 60, timerInterval = null;
@@ -9,7 +11,8 @@ let miniMeCount = 0, gameActive = false;
 let grabbedItem = null, clawOpen = 1, clawAnimFrame = 0;
 let keysPressed = {};
 let VW = 460, VH = 350;
-let viewportEl;
+let CVW = 0, CVH = 0; // Chute Viewport Dimensions
+let viewportEl, chuteEl;
 let faceImages = [];
 for (let i = 1; i <= 5; i++) {
   let img = new Image();
@@ -21,7 +24,7 @@ for (let i = 1; i <= 5; i++) {
 const CLAW_Y_TOP = 40;
 const CLAW_SPEED = 3.5;
 const GRAB_RADIUS = 55;
-const SEPARATOR_X_RATIO = 0.54;
+const SEPARATOR_X_RATIO = 0.15;
 
 // ===== AUDIO ENGINE =====
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -109,7 +112,12 @@ function restartGame() {
   gameState = 'idle'; clawOpen = 1; clawAnimFrame = 0;
   keysPressed = {};
   document.getElementById('score-value').textContent = '0';
-  document.querySelector('.chute-items').innerHTML = '';
+
+  // Clean up chute physics
+  if (chuteRunner) Runner.stop(chuteRunner);
+  if (chuteRender) Render.stop(chuteRender);
+  if (chuteEngine) Engine.clear(chuteEngine);
+  chuteItemsPhysics = [];
 
   // Clean up old physics
   if (runner) Runner.stop(runner);
@@ -147,20 +155,20 @@ function initPhysics() {
   });
 
   const wallOpts = { isStatic: true, render: { visible: false } };
-  const sepX = Math.floor(VW * SEPARATOR_X_RATIO);
+  const sepX = Math.floor(VW * SEPARATOR_X_RATIO); // Reverted to LEFT side
 
   Composite.add(engine.world, [
     Bodies.rectangle(VW / 2, VH + 15, VW, 30, wallOpts),
     Bodies.rectangle(-15, VH / 2, 30, VH, wallOpts),
     Bodies.rectangle(VW + 15, VH / 2, 30, VH, wallOpts),
-    // Separator wall
+    // Separator wall (Left side)
     Bodies.rectangle(sepX, VH - (VH * 0.45) / 2, 6, VH * 0.45, {
       isStatic: true,
       render: { fillStyle: '#ff85a1', strokeStyle: '#000', lineWidth: 2 },
       chamfer: { radius: 3 },
       label: 'separator'
     }),
-    // Small angled ramp
+    // Small angled ramp (Left side)
     Bodies.rectangle(sepX / 2 - 5, VH * 0.52, sepX - 10, 5, {
       isStatic: true, angle: 0.15,
       render: { fillStyle: '#ff85a1', strokeStyle: '#000', lineWidth: 1 },
@@ -168,7 +176,7 @@ function initPhysics() {
     }),
   ]);
 
-  clawX = VW / 2;
+  clawX = VW * 0.6; // Start more towards the right
   spawnItems(sepX);
 
   Render.run(render);
@@ -179,17 +187,54 @@ function initPhysics() {
   window.removeEventListener('keyup', onKeyUp);
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
+
+  // --- SECOND PHYSICS ENGINE: THE CHUTE ---
+  chuteEl = document.querySelector('.chute-items');
+  CVW = chuteEl.clientWidth;
+  CVH = chuteEl.clientHeight;
+
+  chuteEngine = Engine.create({ gravity: { x: 0, y: 1.0 } });
+  chuteRender = Render.create({
+    element: chuteEl, engine: chuteEngine,
+    canvas: document.getElementById('chute-canvas'),
+    options: { width: CVW, height: CVH, wireframes: false, background: 'transparent', pixelRatio: window.devicePixelRatio || 1 }
+  });
+
+  const cWallOpts = { isStatic: true, render: { visible: false } };
+  Composite.add(chuteEngine.world, [
+    Bodies.rectangle(CVW / 2, CVH + 15, CVW, 30, cWallOpts), // floor
+    Bodies.rectangle(-15, CVH / 2, 30, CVH, cWallOpts),    // left
+    Bodies.rectangle(CVW + 15, CVH / 2, 30, CVH, cWallOpts)  // right
+  ]);
+
+  Render.run(chuteRender);
+  chuteRunner = Runner.create();
+  Runner.run(chuteRunner, chuteEngine);
+
+  // Override chute render to draw our items
+  Events.on(chuteRender, 'afterRender', () => {
+    const ctx = chuteRender.context;
+    chuteItemsPhysics.forEach(item => {
+      const pos = item.body.position;
+      ctx.save();
+      ctx.translate(pos.x, pos.y);
+      ctx.rotate(item.body.angle);
+      if (item.type === 'heart') drawHeart(ctx, 0, 0, item.radius);
+      else drawMiniMe(ctx, 0, 0, item.radius, item.img);
+      ctx.restore();
+    });
+  });
 }
 
 // ===== SPAWN ITEMS =====
 function spawnItems(sepX) {
   items = [];
-  const startX = sepX + 25, endX = VW - 30;
-  const startY = VH - 130;
+  const startX = sepX + 25, endX = VW - 30; // Main play area is on the RIGHT
 
-  for (let i = 0; i < 15; i++) {
+  // 1. Foundation: 8 Hearts at the bottom to act as a base
+  for (let i = 0; i < 8; i++) {
     const x = startX + Math.random() * (endX - startX);
-    const y = startY + Math.random() * 80 - 40;
+    const y = VH - 30 - (Math.random() * 20);
     const r = 15 + Math.random() * 5;
     const body = Bodies.circle(x, y, r, {
       restitution: 0.45, friction: 0.3, density: 0.002,
@@ -199,16 +244,34 @@ function spawnItems(sepX) {
     Composite.add(engine.world, body);
   }
 
-  for (let i = 0; i < 5; i++) {
+  // 2. Randomized Mix: Faces and more Hearts jumbled together
+  const mainPool = [
+    ...Array(5).fill('minime'),
+    ...Array(15).fill('heart') // Increased to 15 hearts for a fuller mix
+  ];
+
+  mainPool.forEach((type, i) => {
     const x = startX + Math.random() * (endX - startX);
-    const y = startY + Math.random() * 60 - 80;
-    const body = Bodies.circle(x, y, 28, {
-      restitution: 0.35, friction: 0.4, density: 0.003,
-      render: { visible: false }, label: 'minime'
-    });
-    items.push({ body, type: 'minime', radius: 28, caught: false, img: faceImages[i % faceImages.length] });
-    Composite.add(engine.world, body);
-  }
+    // Vertical range from "middle" depth to "top" of the pile
+    const y = VH - 150 + (Math.random() * 90);
+
+    if (type === 'minime') {
+      const body = Bodies.circle(x, y, 28, {
+        restitution: 0.35, friction: 0.4, density: 0.003,
+        render: { visible: false }, label: 'minime'
+      });
+      items.push({ body, type: 'minime', radius: 28, caught: false, img: faceImages[i % faceImages.length] });
+      Composite.add(engine.world, body);
+    } else {
+      const r = 15 + Math.random() * 5;
+      const body = Bodies.circle(x, y, r, {
+        restitution: 0.45, friction: 0.3, density: 0.002,
+        render: { visible: false }, label: 'heart'
+      });
+      items.push({ body, type: 'heart', radius: r, caught: false });
+      Composite.add(engine.world, body);
+    }
+  });
 }
 
 // ===== INPUT =====
@@ -293,7 +356,7 @@ function updateClaw() {
     clawOpen = Math.min(1, clawAnimFrame / 8);
     if (clawAnimFrame >= 8) {
       if (grabbedItem) {
-        const inChute = clawX < sepX + 10;
+        const inChute = clawX < sepX + 10; // Check left side
         if (inChute) {
           // Animate drop into tube
           animateDropToChute(grabbedItem);
@@ -348,34 +411,53 @@ function createItemCanvas(type, size, img) {
 // ===== ANIMATE DROP INTO CHUTE =====
 function animateDropToChute(item) {
   const vpRect = viewportEl.getBoundingClientRect();
-  const chuteEl = document.querySelector('.prize-chute');
-  const chuteRect = chuteEl.getBoundingClientRect();
+  const cRect = chuteEl.getBoundingClientRect();
 
   const size = item.radius * 2;
   const iconCanvas = createItemCanvas(item.type, size, item.img);
+  const startLeft = vpRect.left + clawX - item.radius;
+  const startTop = vpRect.top + clawCurrentY + 10;
+
   iconCanvas.style.cssText = `
-    position: fixed;
-    z-index: 200;
-    pointer-events: none;
-    left: ${vpRect.left + clawX - item.radius}px;
-    top: ${vpRect.top + clawCurrentY + 10}px;
-    transition: all 0.55s cubic-bezier(0.4, 0, 0.65, 1);
+    position: fixed; z-index: 200; pointer-events: none;
+    left: ${startLeft}px; top: ${startTop}px;
+    transition: top 0.4s cubic-bezier(0.5, 0, 1, 1);
   `;
   document.body.appendChild(iconCanvas);
 
-  // Animate to chute center
+  // Straight drop animation
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      iconCanvas.style.left = `${chuteRect.left + chuteRect.width / 2 - item.radius}px`;
-      iconCanvas.style.top = `${chuteRect.top + chuteRect.height * 0.6}px`;
-      iconCanvas.style.opacity = '0.85';
+      iconCanvas.style.top = `${cRect.top + 10}px`;
     });
   });
 
+  // Once it "hits" the chute bottom visually, spawn it in the second physics engine
   setTimeout(() => {
     iconCanvas.remove();
-    collectItem(item);
-  }, 600);
+
+    // Calculate relative X in the chute
+    const relX = (startLeft + item.radius) - cRect.left;
+    const clampedX = Math.max(15, Math.min(CVW - 15, relX));
+
+    const body = Bodies.circle(clampedX, -20, item.radius, {
+      restitution: 0.3, friction: 0.5, density: 0.005,
+      render: { visible: false }
+    });
+
+    chuteItemsPhysics.push({ body, type: item.type, radius: item.radius, img: item.img });
+    Composite.add(chuteEngine.world, body);
+
+    // Final bookkeeping
+    if (item.type === 'minime') {
+      miniMeCount++;
+      document.getElementById('score-value').textContent = miniMeCount;
+      showYay(); playSound('yay');
+      if (miniMeCount >= 5) endGame();
+    } else {
+      playSound('collect');
+    }
+  }, 410);
 }
 
 // ===== COLLECT =====
@@ -437,6 +519,8 @@ function endGame() {
       document.getElementById('game-screen').classList.remove('active');
       if (runner) Runner.stop(runner);
       if (render) Render.stop(render);
+      if (chuteRunner) Runner.stop(chuteRunner);
+      if (chuteRender) Render.stop(chuteRender);
     }, 1600);
   }, 600);
 }
@@ -450,7 +534,7 @@ function customDraw() {
 
   ctx.save();
 
-  // Chute zone indicator - very subtle
+  // Chute zone indicator - subtle on the LEFT
   ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
   ctx.fillRect(0, 0, sepX, VH);
 
@@ -462,8 +546,9 @@ function customDraw() {
   ctx.font = '12px Fredoka One';
   ctx.fillText('DROP', sepX / 2, VH * 0.15);
 
-  // Arrow pointing down in chute zone
-  if (gameState === 'holding' && clawX < sepX + 10) {
+  // Arrow pointing down in chute zone (LEFT SIDE)
+  const isOverChute = clawX < sepX;
+  if (gameState === 'holding' && isOverChute) {
     ctx.fillStyle = 'rgba(255, 71, 126, 0.2)';
     ctx.font = '24px sans-serif';
     ctx.textAlign = 'center';
