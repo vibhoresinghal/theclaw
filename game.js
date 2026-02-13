@@ -659,7 +659,7 @@ function updateClaw() {
   }
 
   if (gameState === 'dropping') {
-    clawCurrentY += 1.3 * scaleFactor;
+    clawCurrentY += 1.3;
     // Stop early if the claw tip reaches the topmost item under it
     const tipY = clawCurrentY + 30 * scaleFactor;
     let hitItem = false;
@@ -693,7 +693,7 @@ function updateClaw() {
   }
 
   if (gameState === 'lifting') {
-    clawCurrentY -= 1.2 * scaleFactor;
+    clawCurrentY -= 1.2;
     if (grabbedItem) {
       Body.setPosition(grabbedItem.body, { x: clawX, y: clawCurrentY + 32 * scaleFactor });
       Body.setVelocity(grabbedItem.body, { x: 0, y: 0 });
