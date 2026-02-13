@@ -9,14 +9,6 @@
   .bulb-row-2 { animation-delay: 0.4s; }
   .bulb-row-3 { animation-delay: 0.8s; }
   .bulb-row-4 { animation-delay: 1.2s; }
-  .bulb-light {
-    animation: bulbFill 1.6s ease-in-out infinite;
-    will-change: fill;
-  }
-  .bulb-row-1 .bulb-light { animation-delay: 0s; }
-  .bulb-row-2 .bulb-light { animation-delay: 0.4s; }
-  .bulb-row-3 .bulb-light { animation-delay: 0.8s; }
-  .bulb-row-4 .bulb-light { animation-delay: 1.2s; }
   @keyframes bulbGlow {
     0%, 100% {
       filter: drop-shadow(0 0 2px rgba(252, 244, 154, 0.1));
@@ -25,25 +17,12 @@
       filter: drop-shadow(0 0 14px rgba(255, 255, 200, 1)) drop-shadow(0 0 24px rgba(252, 182, 154, 0.7));
     }
   }
-  @keyframes bulbFill {
-    0%, 100% {
-      fill: #E8C36A;
-    }
-    20%, 35% {
-      fill: #FFFDE0;
-    }
-  }
   @media (max-width: 600px) {
     .bulb-row-1, .bulb-row-2, .bulb-row-3, .bulb-row-4 {
       animation: none;
       filter: none;
       will-change: auto;
       transform: none;
-    }
-    .bulb-light {
-      animation: none;
-      fill: #E8C36A;
-      will-change: auto;
     }
   }
 </style>
@@ -74,34 +53,34 @@
 <path d="M411 565C415.446 565 419.595 565.896 422.725 567.461C425.705 568.951 428.5 571.472 428.5 575C428.5 578.528 425.705 581.049 422.725 582.539C419.595 584.104 415.446 585 411 585C406.554 585 402.405 584.104 399.275 582.539C396.295 581.049 393.5 578.528 393.5 575C393.5 571.472 396.295 568.951 399.275 567.461C402.405 565.896 406.554 565 411 565Z" fill="#F4757F" stroke="#8B2F32" stroke-width="5"/>
 <g class="bulb-row-1">
 <ellipse cx="13" cy="12.5" rx="13" ry="12.5" transform="matrix(1 0 0 -1 497 259.5)" fill="#97AAFF" stroke="#8B2F32" stroke-width="5"/>
-<circle class="bulb-light" cx="21.5" cy="21.5" r="21.5" transform="matrix(1 0 0 -1 506 259.5)" stroke="#8B2F32" stroke-width="5"/>
+<circle cx="21.5" cy="21.5" r="21.5" transform="matrix(1 0 0 -1 506 259.5)" fill="url(#paint8_linear_221_1539)" stroke="#8B2F32" stroke-width="5"/>
 <circle cx="9" cy="9" r="9" transform="matrix(-1 0 0 1 542.088 225.5)" fill="#FEFCF4"/>
 <ellipse cx="44.0879" cy="247" rx="13" ry="12.5" transform="rotate(180 44.0879 247)" fill="#97AAFF" stroke="#8B2F32" stroke-width="5"/>
-<circle class="bulb-light" cx="26.5879" cy="238" r="21.5" transform="rotate(180 26.5879 238)" stroke="#8B2F32" stroke-width="5"/>
+<circle cx="26.5879" cy="238" r="21.5" transform="rotate(180 26.5879 238)" fill="url(#paint12_linear_221_1539)" stroke="#8B2F32" stroke-width="5"/>
 <circle cx="21" cy="234.5" r="9" fill="#FEFCF4"/>
 </g>
 <g class="bulb-row-2">
 <ellipse cx="13" cy="12.5" rx="13" ry="12.5" transform="matrix(0.979944 0.199275 0.199275 -0.979944 493.237 345.888)" fill="#97AAFF" stroke="#8B2F32" stroke-width="5"/>
-<circle class="bulb-light" cx="21.5" cy="21.5" r="21.5" transform="matrix(0.979944 0.199275 0.199275 -0.979944 502.057 347.681)" stroke="#8B2F32" stroke-width="5"/>
+<circle cx="21.5" cy="21.5" r="21.5" transform="matrix(0.979944 0.199275 0.199275 -0.979944 502.057 347.681)" fill="url(#paint9_linear_221_1539)" stroke="#8B2F32" stroke-width="5"/>
 <circle cx="9" cy="9" r="9" transform="matrix(-1 0 0 1 542.088 321.5)" fill="#FEFCF4"/>
 <ellipse cx="45.6206" cy="336.229" rx="13" ry="12.5" transform="rotate(168.505 45.6206 336.229)" fill="#97AAFF" stroke="#8B2F32" stroke-width="5"/>
-<circle class="bulb-light" cx="26.678" cy="330.897" r="21.5" transform="rotate(168.505 26.678 330.897)" stroke="#8B2F32" stroke-width="5"/>
+<circle cx="26.678" cy="330.897" r="21.5" transform="rotate(168.505 26.678 330.897)" fill="url(#paint13_linear_221_1539)" stroke="#8B2F32" stroke-width="5"/>
 <circle cx="21" cy="330.5" r="9" fill="#FEFCF4"/>
 </g>
 <g class="bulb-row-3">
 <ellipse cx="507.96" cy="417.123" rx="13" ry="12.5" transform="rotate(-16.7275 507.96 417.123)" fill="#97AAFF" stroke="#8B2F32" stroke-width="5"/>
-<circle class="bulb-light" cx="527.31" cy="420.705" r="21.5" transform="rotate(-16.7275 527.31 420.705)" stroke="#8B2F32" stroke-width="5"/>
+<circle cx="527.31" cy="420.705" r="21.5" transform="rotate(-16.7275 527.31 420.705)" fill="url(#paint10_linear_221_1539)" stroke="#8B2F32" stroke-width="5"/>
 <circle cx="9" cy="9" r="9" transform="matrix(-1 0 0 1 542.088 408.5)" fill="#FEFCF4"/>
 <ellipse cx="13" cy="12.5" rx="13" ry="12.5" transform="matrix(-0.957685 -0.28782 -0.28782 0.957685 62.1758 408.894)" fill="#97AAFF" stroke="#8B2F32" stroke-width="5"/>
-<circle class="bulb-light" cx="21.5" cy="21.5" r="21.5" transform="matrix(-0.957685 -0.28782 -0.28782 0.957685 53.5566 406.303)" stroke="#8B2F32" stroke-width="5"/>
+<circle cx="21.5" cy="21.5" r="21.5" transform="matrix(-0.957685 -0.28782 -0.28782 0.957685 53.5566 406.303)" fill="url(#paint14_linear_221_1539)" stroke="#8B2F32" stroke-width="5"/>
 <circle cx="21" cy="417.5" r="9" fill="#FEFCF4"/>
 </g>
 <g class="bulb-row-4">
 <ellipse cx="509" cy="505" rx="13" ry="12.5" fill="#97AAFF" stroke="#8B2F32" stroke-width="5"/>
-<circle class="bulb-light" cx="526.5" cy="514" r="21.5" stroke="#8B2F32" stroke-width="5"/>
+<circle cx="526.5" cy="514" r="21.5" fill="url(#paint11_linear_221_1539)" stroke="#8B2F32" stroke-width="5"/>
 <circle cx="9" cy="9" r="9" transform="matrix(-1 0 0 1 542.088 500.5)" fill="#FEFCF4"/>
 <ellipse cx="13" cy="12.5" rx="13" ry="12.5" transform="matrix(-1 0 0 1 58.0879 492.5)" fill="#97AAFF" stroke="#8B2F32" stroke-width="5"/>
-<circle class="bulb-light" cx="21.5" cy="21.5" r="21.5" transform="matrix(-1 0 0 1 49.0879 492.5)" stroke="#8B2F32" stroke-width="5"/>
+<circle cx="21.5" cy="21.5" r="21.5" transform="matrix(-1 0 0 1 49.0879 492.5)" fill="url(#paint15_linear_221_1539)" stroke="#8B2F32" stroke-width="5"/>
 <circle cx="21" cy="509.5" r="9" fill="#FEFCF4"/>
 </g>
 <mask id="mask0_221_1539" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="93" y="207" width="370" height="308">
