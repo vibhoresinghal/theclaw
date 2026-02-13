@@ -2,8 +2,8 @@ const { Engine, Render, Runner, Bodies, Body, Composite, Events } = Matter;
 
 // Constants must be defined first
 const CLAW_Y_TOP = 40;
-const CLAW_SPEED = 3.5;
-const GRAB_RADIUS = 55;
+const CLAW_SPEED = 1.4;
+const GRAB_RADIUS = 32;
 const SEPARATOR_X_RATIO = 0.15;
 
 let engine, render, runner;
@@ -14,7 +14,7 @@ let gameState = 'idle';
 let VW = 460, VH = 350;
 let clawX = VW / 2, clawCurrentY = CLAW_Y_TOP;
 let gameTimer = 60, timerInterval = null;
-let miniMeCount = 0, gameActive = false;
+let miniMeCount = 0, gameActive = false, gamePaused = false;
 let grabbedItem = null, clawOpen = 1, clawAnimFrame = 0;
 let clawSway = 0, clawSwayVel = 0; // Current sway angle and its velocity
 let keysPressed = {};
@@ -88,6 +88,14 @@ function playSound(type) {
     gain.gain.setValueAtTime(0.08, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
     osc.start(now); osc.stop(now + 0.15);
+  } else if (type === 'tick') {
+    // Subtle tick — gets more urgent when time is low
+    const urgent = gameTimer <= 10;
+    osc.frequency.value = urgent ? 880 : 440;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(urgent ? 0.06 : 0.03, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + (urgent ? 0.08 : 0.05));
+    osc.start(now); osc.stop(now + (urgent ? 0.08 : 0.05));
   }
 }
 
@@ -111,8 +119,13 @@ function restartGame() {
   finale.classList.remove('active', 'visible');
   miniMeCount = 0; gameTimer = 60; grabbedItem = null;
   gameState = 'idle'; clawOpen = 1; clawAnimFrame = 0;
-  keysPressed = {};
+  keysPressed = {}; gamePaused = false;
   document.getElementById('score-value').textContent = '0';
+  updateSideScore();
+
+  // Remove pause overlay if present
+  const pauseOverlay = document.querySelector('.pause-overlay');
+  if (pauseOverlay) pauseOverlay.remove();
 
   // Clean up chute physics
   if (chuteRunner) Runner.stop(chuteRunner);
@@ -138,6 +151,68 @@ function restartGame() {
   initPhysics();
   gameActive = true;
   startTimer();
+}
+
+// ===== PAUSE/RESUME =====
+function togglePause() {
+  if (!gameActive) return;
+  gamePaused = !gamePaused;
+  const icon = document.getElementById('pause-icon');
+  const label = document.getElementById('pause-label');
+
+  if (gamePaused) {
+    clearInterval(timerInterval);
+    if (runner) Runner.stop(runner);
+    if (chuteRunner) Runner.stop(chuteRunner);
+    icon.textContent = '▶';
+    label.textContent = 'RESUME';
+    // Show pause overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'pause-overlay';
+    overlay.innerHTML = '<div class="pause-overlay-text">⏸ PAUSED</div>';
+    overlay.addEventListener('click', togglePause);
+    document.body.appendChild(overlay);
+  } else {
+    // Resume timer
+    timerInterval = setInterval(() => {
+      gameTimer--;
+      updateTimerDisplay();
+      if (gameTimer <= 0) { clearInterval(timerInterval); endGame(); }
+    }, 1000);
+    if (runner) Runner.run(runner, engine);
+    if (chuteRunner) Runner.run(chuteRunner, chuteEngine);
+    icon.textContent = '⏸';
+    label.textContent = 'PAUSE';
+    // Remove pause overlay
+    const overlay = document.querySelector('.pause-overlay');
+    if (overlay) overlay.remove();
+  }
+}
+
+// ===== SIDE PANEL HELPERS =====
+function updateSideScore() {
+  const el = document.getElementById('score-display-side');
+  if (el) el.textContent = miniMeCount;
+}
+
+const tips = [
+  'Time it right when the claw is above a doll!',
+  'Move the doll to the LEFT chute to collect!',
+  'Catch all 5 faces to win! 💕',
+  'Hearts are cute but faces score points!',
+  'You can grab a face and move it with ← →!',
+];
+let currentTip = 0;
+function rotateTip() {
+  currentTip = (currentTip + 1) % tips.length;
+  const el = document.getElementById('tip-text');
+  if (el) {
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.textContent = tips[currentTip];
+      el.style.opacity = '0.75';
+    }, 300);
+  }
 }
 
 // ===== PHYSICS INIT =====
@@ -289,7 +364,7 @@ function onKeyUp(e) { keysPressed[e.code] = false; }
 
 // ===== CLAW STATE MACHINE =====
 function updateClaw() {
-  if (!gameActive) return;
+  if (!gameActive || gamePaused) return;
   const sepX = Math.floor(VW * SEPARATOR_X_RATIO);
 
   // Calculate Sway (Pendulum Physics)
@@ -305,7 +380,7 @@ function updateClaw() {
   }
 
   if (gameState === 'dropping') {
-    clawCurrentY += 3.2;
+    clawCurrentY += 1.3;
     // Stop early if the claw tip reaches the topmost item under it
     const tipY = clawCurrentY + 30;
     let hitItem = false;
@@ -337,7 +412,7 @@ function updateClaw() {
   }
 
   if (gameState === 'lifting') {
-    clawCurrentY -= 2.8;
+    clawCurrentY -= 1.2;
     if (grabbedItem) {
       Body.setPosition(grabbedItem.body, { x: clawX, y: clawCurrentY + 32 });
       Body.setVelocity(grabbedItem.body, { x: 0, y: 0 });
@@ -465,6 +540,7 @@ function animateDropToChute(item) {
     if (item.type === 'minime') {
       miniMeCount++;
       document.getElementById('score-value').textContent = miniMeCount;
+      updateSideScore();
       showYay(); playSound('yay');
       if (miniMeCount >= 5) endGame();
     } else {
@@ -507,14 +583,29 @@ function showYay() {
 function startTimer() {
   gameTimer = 60;
   updateTimerDisplay();
+  // Start tip rotation
+  if (window._tipInterval) clearInterval(window._tipInterval);
+  window._tipInterval = setInterval(rotateTip, 6000);
+
   timerInterval = setInterval(() => {
+    if (gamePaused) return;
     gameTimer--;
     updateTimerDisplay();
-    if (gameTimer <= 0) { clearInterval(timerInterval); endGame(); }
+    playSound('tick');
+    if (gameTimer <= 0) { clearInterval(timerInterval); clearInterval(window._tipInterval); endGame(); }
   }, 1000);
 }
 function updateTimerDisplay() {
   document.getElementById('timer-display').textContent = '0:' + String(gameTimer).padStart(2, '0');
+  // Update timer bar
+  const bar = document.getElementById('timer-bar');
+  if (bar) bar.style.width = ((gameTimer / 60) * 100) + '%';
+  // Color change when low
+  const timerEl = document.getElementById('timer-display');
+  if (timerEl) {
+    if (gameTimer <= 10) timerEl.style.color = '#ff1744';
+    else timerEl.style.color = '#ff477e';
+  }
 }
 
 // ===== END GAME =====
@@ -780,16 +871,19 @@ function createFloatingHearts() {
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   createFloatingHearts();
-  const wrapper = document.querySelector('.machine-wrapper');
-  const decos = ['💖', '⭐', '💕', '✨', '♥', '🌸'];
-  for (let i = 0; i < 10; i++) {
-    const d = document.createElement('span');
-    d.className = 'deco';
-    d.textContent = decos[Math.floor(Math.random() * decos.length)];
-    d.style.left = (10 + Math.random() * 80) + '%';
-    d.style.top = (50 + Math.random() * 45) + '%';
-    d.style.fontSize = (10 + Math.random() * 10) + 'px';
-    d.style.transform = `rotate(${Math.random() * 40 - 20}deg)`;
-    wrapper.appendChild(d);
+  // Add decorative emojis to the machine container
+  const wrapper = document.querySelector('.custom-machine-container');
+  if (wrapper) {
+    const decos = ['💖', '⭐', '💕', '✨', '♥', '🌸'];
+    for (let i = 0; i < 10; i++) {
+      const d = document.createElement('span');
+      d.className = 'deco';
+      d.textContent = decos[Math.floor(Math.random() * decos.length)];
+      d.style.left = (10 + Math.random() * 80) + '%';
+      d.style.top = (50 + Math.random() * 45) + '%';
+      d.style.fontSize = (10 + Math.random() * 10) + 'px';
+      d.style.transform = `rotate(${Math.random() * 40 - 20}deg)`;
+      wrapper.appendChild(d);
+    }
   }
 });

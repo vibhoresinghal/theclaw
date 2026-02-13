@@ -400,31 +400,318 @@ body {
 
 
 /* ================================================================
-    GAME SCREEN — CUSTOM IMAGE OVERLAY SYSTEM
-    ================================================================ */
+     GAME SCREEN — 3-COLUMN LAYOUT WITH SIDE PANELS
+     ================================================================ */
 #game-screen {
   position: fixed;
   inset: 0;
   display: none;
-  background: #fde2e4;
+  background: linear-gradient(180deg, #fde2e4 0%, #fff0f3 50%, #fde2e4 100%);
   align-items: center;
   justify-content: center;
+  gap: 24px;
   perspective: 1200px;
+  padding: 20px;
 }
 
 #game-screen.active {
   display: flex;
 }
 
-/* The container that holds your image and the hotspots */
+/* ===== SIDE PANELS ===== */
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 180px;
+  flex-shrink: 0;
+  align-self: center;
+  z-index: 10;
+  position: relative;
+}
+
+/* Glassmorphic panel cards */
+.panel-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 71, 126, 0.15);
+  border-radius: 18px;
+  padding: 18px 16px;
+  text-align: center;
+  box-shadow:
+    0 8px 32px rgba(180, 60, 100, 0.08),
+    inset 0 0 20px rgba(255, 133, 162, 0.03);
+  animation: panelSlideIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.side-panel-left .panel-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.side-panel-left .panel-card:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.side-panel-right .panel-card:nth-child(1) {
+  animation-delay: 0.15s;
+}
+
+.side-panel-right .panel-card:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.side-panel-right .panel-card:nth-child(3) {
+  animation-delay: 0.45s;
+}
+
+@keyframes panelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.panel-card-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.7rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #ff85a2;
+  margin-bottom: 10px;
+  opacity: 0.85;
+}
+
+/* ===== TIMER CARD ===== */
+.timer-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 240, 243, 0.9));
+}
+
+.timer-value {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.6rem;
+  color: #ff477e;
+  letter-spacing: 3px;
+  line-height: 1;
+  margin-bottom: 12px;
+  text-shadow: 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.timer-bar-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 71, 126, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.timer-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff477e, #ff85a2);
+  border-radius: 10px;
+  transition: width 1s linear;
+  box-shadow: 0 0 8px rgba(255, 71, 126, 0.4);
+}
+
+/* ===== INSTRUCTIONS CARD ===== */
+.instructions-card {
+  padding: 16px 14px;
+}
+
+.instruction-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.instruction-row:last-child {
+  margin-bottom: 0;
+}
+
+.key-group {
+  display: flex;
+  gap: 4px;
+}
+
+.key-group kbd {
+  background: #fff;
+  border: 2px solid #ffb3c6;
+  border-bottom: 3px solid #ff85a2;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.75rem;
+  color: #ff477e;
+  box-shadow: 0 2px 0 rgba(255, 71, 126, 0.15);
+}
+
+.instruction-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  color: #c4365a;
+  font-weight: 600;
+}
+
+/* ===== PAUSE CARD ===== */
+.pause-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #ff477e, #ff85a2);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(255, 71, 126, 0.3);
+}
+
+.pause-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(255, 71, 126, 0.45);
+}
+
+.pause-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.pause-icon {
+  font-size: 1.2rem;
+  filter: brightness(10);
+}
+
+.pause-label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.8rem;
+  color: #fff;
+  letter-spacing: 2px;
+}
+
+.pause-card {
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ===== SCORE CARD ===== */
+.score-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 240, 243, 0.9));
+}
+
+.score-big {
+  font-family: 'Fredoka One', cursive;
+  font-size: 3rem;
+  color: #ff477e;
+  line-height: 1;
+  text-shadow: 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.score-sub {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  color: #ff85a2;
+  font-weight: 600;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+/* ===== TIP CARD ===== */
+.tip-card {
+  padding: 14px 12px;
+}
+
+.tip-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  color: #9b3060;
+  line-height: 1.5;
+  opacity: 0.75;
+}
+
+/* ===== SIDE DECORATIVE ELEMENTS ===== */
+.side-deco-hearts {
+  position: relative;
+  height: 60px;
+  pointer-events: none;
+}
+
+.side-heart {
+  position: absolute;
+  font-size: 18px;
+  opacity: 0.25;
+  animation: floatDoll 8s ease-in-out infinite;
+}
+
+.sh-1 {
+  left: 10%;
+  top: 0;
+  animation-delay: 0s;
+}
+
+.sh-2 {
+  right: 15%;
+  top: 20px;
+  animation-delay: 1.5s;
+}
+
+.sh-3 {
+  left: 40%;
+  top: 35px;
+  animation-delay: 3s;
+}
+
+.sh-4 {
+  right: 30%;
+  top: 5px;
+  animation-delay: 4.5s;
+}
+
+.sh-5 {
+  left: 20%;
+  top: 10px;
+  animation-delay: 0.5s;
+}
+
+.sh-6 {
+  right: 10%;
+  top: 30px;
+  animation-delay: 2s;
+}
+
+.sh-7 {
+  left: 50%;
+  top: 0;
+  animation-delay: 3.5s;
+}
+
+.sh-8 {
+  right: 40%;
+  top: 40px;
+  animation-delay: 5s;
+}
+
+/* ===== MACHINE CONTAINER ===== */
 .custom-machine-container {
   position: relative;
-  width: min(555px, 95vw);
-  /* Updated for new SVG height */
+  width: min(480px, 60vw);
   aspect-ratio: 555 / 884;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .machine-frame-img {
@@ -437,7 +724,7 @@ body {
   z-index: 1;
 }
 
-/* 1. Viewport (The Glass Window) - Lowered to match SVG */
+/* 1. Viewport (The Glass Window) */
 .glass-viewport {
   position: absolute;
   top: 23.13%;
@@ -467,7 +754,7 @@ body {
   height: 100% !important;
 }
 
-/* 2. Prize Out Box (The Chute) - Reverted to LEFT side */
+/* 2. Prize Out Box (The Chute) */
 .prize-chute {
   position: absolute;
   top: 78.3%;
@@ -500,44 +787,7 @@ body {
   background: transparent !important;
 }
 
-/* 3. External UI Elements (Premium Arcade Timer) */
-.external-ui {
-  position: absolute;
-  top: 30px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 100;
-}
-
-.timer-display {
-  font-family: 'Fredoka One', cursive;
-  font-size: 2.2rem;
-  color: #fff;
-  background: linear-gradient(135deg, #ff477e 0%, #ff85a2 100%);
-  padding: 12px 45px;
-  border: 4px solid #fff;
-  border-radius: 80px;
-  box-shadow:
-    0 10px 30px rgba(255, 71, 126, 0.4),
-    inset 0 0 15px rgba(255, 255, 255, 0.4);
-  pointer-events: auto;
-  letter-spacing: 4px;
-  text-shadow: 2px 3px 0px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.timer-display::before {
-  content: '⏳';
-  font-size: 1.8rem;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
-}
-
-/* 4. Score Display */
+/* Score overlay on machine (hidden now, using side panel) */
 .overlay-score {
   position: absolute;
   top: 75%;
@@ -589,32 +839,35 @@ body {
   }
 }
 
-/* Key Hints */
-.key-hints {
-  position: absolute;
-  bottom: 20px;
-  display: flex;
-  gap: 20px;
-  font-size: 0.8rem;
-  color: #000;
-  font-weight: 600;
-  z-index: 10;
-}
-
-.key-hint {
+/* ===== PAUSED OVERLAY ===== */
+.pause-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
 }
 
-.key-hint kbd {
-  background: #fff;
-  border: 2px solid #000;
-  border-radius: 4px;
-  padding: 2px 8px;
-  box-shadow: 2px 2px 0 #000;
-  font-family: inherit;
-  font-size: 0.8rem;
+.pause-overlay-text {
+  font-family: 'Fredoka One', cursive;
+  font-size: 4rem;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(255, 71, 126, 0.5);
+  animation: gentlePulse 2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 
@@ -792,9 +1045,51 @@ body {
   box-shadow: 0 10px 35px rgba(255, 71, 126, 0.55);
 }
 
+/* Tip text transition */
+.tip-text {
+  transition: opacity 0.3s ease;
+}
+
 /* ================================================================
    RESPONSIVE
    ================================================================ */
+
+/* Side panels shrink on medium screens */
+@media (max-width: 1100px) {
+  .side-panel {
+    width: 150px;
+  }
+
+  .timer-value {
+    font-size: 2.2rem;
+  }
+
+  .score-big {
+    font-size: 2.5rem;
+  }
+
+  #game-screen {
+    gap: 16px;
+    padding: 15px;
+  }
+}
+
+/* Hide side panels on smaller screens */
+@media (max-width: 850px) {
+  .side-panel {
+    display: none;
+  }
+
+  .custom-machine-container {
+    width: min(480px, 90vw);
+  }
+
+  #game-screen {
+    gap: 0;
+    padding: 10px;
+  }
+}
+
 @media (max-width: 520px) {
   .postcard-inner {
     padding: 44px 24px 36px;
@@ -847,5 +1142,9 @@ body {
   .finale-doll {
     width: 44px;
     height: 44px;
+  }
+
+  .custom-machine-container {
+    width: min(480px, 95vw);
   }
 }

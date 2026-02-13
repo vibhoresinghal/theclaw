@@ -73,42 +73,89 @@
 
     <!-- ============ PHASE 2-3: GAME ============ -->
     <div id="game-screen">
+
+        <!-- LEFT SIDE PANEL -->
+        <div class="side-panel side-panel-left">
+            <div class="panel-card timer-card">
+                <div class="panel-card-label">⏳ TIME</div>
+                <div id="timer-display" class="timer-value">0:60</div>
+                <div class="timer-bar-track">
+                    <div class="timer-bar-fill" id="timer-bar"></div>
+                </div>
+            </div>
+
+            <div class="panel-card instructions-card">
+                <div class="panel-card-label">🎮 CONTROLS</div>
+                <div class="instruction-row">
+                    <div class="key-group">
+                        <kbd>←</kbd><kbd>→</kbd>
+                    </div>
+                    <span class="instruction-text">Move</span>
+                </div>
+                <div class="instruction-row">
+                    <div class="key-group">
+                        <kbd>Space</kbd>
+                    </div>
+                    <span class="instruction-text">Catch!</span>
+                </div>
+            </div>
+
+            <div class="side-deco-hearts">
+                <span class="side-heart sh-1">💗</span>
+                <span class="side-heart sh-2">💕</span>
+                <span class="side-heart sh-3">✨</span>
+                <span class="side-heart sh-4">🌸</span>
+            </div>
+        </div>
+
         <!-- The Custom Image Machine Wrapper -->
         <div class="custom-machine-container">
-            <!-- Your SVG/PNG will go here -->
             <img src="machine_frame.svg" class="machine-frame-img" id="machine-frame">
 
-            <!-- INTERACTIVE OVERLAYS (Positioned precisely over the image) -->
-
-            <!-- 1. The Glass Window (Game Viewport) -->
+            <!-- INTERACTIVE OVERLAYS -->
             <div class="glass-viewport">
                 <div class="viewport-grid"></div>
                 <canvas id="game-canvas"></canvas>
                 <div class="glass-shine"></div>
             </div>
 
-            <!-- 2. The Prize Collection Box -->
             <div class="prize-chute">
                 <div class="chute-items">
                     <canvas id="chute-canvas"></canvas>
                 </div>
             </div>
 
-            <!-- 3. The Score Overlay -->
             <div class="overlay-score">
                 <div id="score-value" class="score-value">0</div>
             </div>
         </div>
 
-        <!-- External UI Elements (Outside Machine) -->
-        <div class="external-ui">
-            <div id="timer-display" class="timer-display">00:60</div>
-        </div>
+        <!-- RIGHT SIDE PANEL -->
+        <div class="side-panel side-panel-right">
+            <div class="panel-card pause-card">
+                <button class="pause-btn" id="pause-btn" onclick="togglePause()">
+                    <span class="pause-icon" id="pause-icon">⏸</span>
+                    <span class="pause-label" id="pause-label">PAUSE</span>
+                </button>
+            </div>
 
-        <!-- Key Hints (Optional placement) -->
-        <div class="key-hints">
-            <div class="key-hint"><kbd>←</kbd><kbd>→</kbd> Move</div>
-            <div class="key-hint"><kbd>Space</kbd> Catch</div>
+            <div class="panel-card score-card">
+                <div class="panel-card-label">⭐ CAUGHT</div>
+                <div class="score-big" id="score-display-side">0</div>
+                <div class="score-sub">/ 5</div>
+            </div>
+
+            <div class="panel-card tip-card">
+                <div class="panel-card-label">💡 TIP</div>
+                <p class="tip-text" id="tip-text">Time it right when the claw is above a doll!</p>
+            </div>
+
+            <div class="side-deco-hearts">
+                <span class="side-heart sh-5">⭐</span>
+                <span class="side-heart sh-6">💖</span>
+                <span class="side-heart sh-7">♥</span>
+                <span class="side-heart sh-8">✦</span>
+            </div>
         </div>
     </div>
 
