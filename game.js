@@ -27,8 +27,272 @@ for (let i = 1; i <= 5; i++) {
   faceImages.push(img);
 }
 
+// ===== PARTICLE SYSTEM =====
+let particles = [];
+
+function spawnParticles(x, y, count, type) {
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 6,
+      vy: -Math.random() * 5 - 2,
+      life: 1,
+      decay: 0.015 + Math.random() * 0.015,
+      size: 4 + Math.random() * 6,
+      type: type || (Math.random() > 0.5 ? 'heart' : 'star'),
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.2,
+    });
+  }
+}
+
+function updateAndDrawParticles(ctx) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.12; // gravity
+    p.life -= p.decay;
+    p.rotation += p.rotSpeed;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    ctx.save();
+    ctx.globalAlpha = p.life;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    if (p.type === 'heart') {
+      drawHeart(ctx, 0, 0, p.size);
+    } else if (p.type === 'star') {
+      ctx.fillStyle = '#FFD700';
+      drawStar(ctx, 0, 0, p.size * 0.4, p.size, 5);
+    } else {
+      ctx.fillStyle = p.color || '#ff477e';
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+    }
+    ctx.restore();
+  }
+}
+
+function drawStar(ctx, cx, cy, innerR, outerR, points) {
+  ctx.beginPath();
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const angle = (i * Math.PI) / points - Math.PI / 2;
+    ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+// ===== CONFETTI SYSTEM =====
+let confettiPieces = [];
+let confettiActive = false;
+
+function triggerConfetti() {
+  confettiActive = true;
+  const colors = ['#ff477e', '#ff85a2', '#ffb3c6', '#FFD700', '#ff1493', '#ff69b4', '#fff'];
+  for (let i = 0; i < 120; i++) {
+    confettiPieces.push({
+      x: Math.random() * window.innerWidth,
+      y: -20 - Math.random() * 200,
+      vx: (Math.random() - 0.5) * 4,
+      vy: 1.5 + Math.random() * 3,
+      size: 4 + Math.random() * 6,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 8,
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: 0.03 + Math.random() * 0.05,
+      life: 1,
+    });
+  }
+  requestAnimationFrame(animateConfetti);
+}
+
+function animateConfetti() {
+  if (!confettiActive || confettiPieces.length === 0) { confettiActive = false; return; }
+  // Remove off-screen pieces
+  for (let i = confettiPieces.length - 1; i >= 0; i--) {
+    const p = confettiPieces[i];
+    p.x += p.vx + Math.sin(p.wobble) * 0.5;
+    p.y += p.vy;
+    p.wobble += p.wobbleSpeed;
+    p.rotation += p.rotSpeed;
+    if (p.y > window.innerHeight + 20) {
+      confettiPieces.splice(i, 1);
+    }
+  }
+  drawConfetti();
+  if (confettiPieces.length > 0) requestAnimationFrame(animateConfetti);
+  else confettiActive = false;
+}
+
+function drawConfetti() {
+  let canvas = document.getElementById('confetti-canvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'confetti-canvas';
+    canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:500;';
+    document.body.appendChild(canvas);
+  }
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  confettiPieces.forEach(p => {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+    ctx.restore();
+  });
+  if (confettiPieces.length === 0 && canvas) canvas.remove();
+}
+
+// ===== SCREEN SHAKE =====
+function screenShake(intensity, duration) {
+  const container = document.querySelector('.custom-machine-container');
+  if (!container) return;
+  const start = performance.now();
+  function shake(now) {
+    const elapsed = now - start;
+    if (elapsed > duration) {
+      container.style.transform = '';
+      return;
+    }
+    const progress = 1 - elapsed / duration;
+    const x = (Math.random() - 0.5) * intensity * progress;
+    const y = (Math.random() - 0.5) * intensity * progress;
+    container.style.transform = `translate(${x}px, ${y}px)`;
+    requestAnimationFrame(shake);
+  }
+  requestAnimationFrame(shake);
+}
+
+function bounceScore() {
+  const el = document.getElementById('score-display-side');
+  if (!el) return;
+  el.style.transform = 'scale(1.4)';
+  el.style.transition = 'transform 0.15s ease-out';
+  setTimeout(() => {
+    el.style.transform = 'scale(1)';
+    el.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  }, 150);
+  // Golden glow on score card
+  const card = document.querySelector('.score-card');
+  if (card) {
+    card.classList.remove('score-celebrate');
+    void card.offsetWidth; // force reflow
+    card.classList.add('score-celebrate');
+    setTimeout(() => card.classList.remove('score-celebrate'), 700);
+  }
+}
+
 // ===== AUDIO ENGINE =====
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// ===== BACKGROUND MUSIC =====
+let bgMusicNodes = null;
+
+function startBgMusic() {
+  if (bgMusicNodes) return;
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.035;
+  gain.connect(audioCtx.destination);
+
+  // Longer melody: two 16-note phrases for variety (~16 seconds per loop)
+  const notes = [
+    // Phrase 1: ascending cheerful
+    523, 587, 659, 784, 659, 587, 523, 494,
+    440, 494, 523, 587, 659, 784, 880, 784,
+    // Phrase 2: descending reflective
+    659, 587, 523, 494, 440, 494, 523, 587,
+    659, 784, 880, 784, 659, 587, 523, 494
+  ];
+  const noteLen = 0.5;
+  const loopLen = notes.length * noteLen;
+  let startTime = audioCtx.currentTime;
+
+  function scheduleLoop() {
+    if (!bgMusicNodes) return;
+    const now = audioCtx.currentTime;
+    // Schedule notes ahead
+    while (startTime < now + 1) {
+      notes.forEach((freq, i) => {
+        const t = startTime + i * noteLen;
+        if (t < now) return;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.connect(g);
+        g.connect(gain);
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        g.gain.setValueAtTime(0.5, t);
+        g.gain.exponentialRampToValueAtTime(0.01, t + noteLen * 0.9);
+        osc.start(t);
+        osc.stop(t + noteLen);
+      });
+      startTime += loopLen;
+    }
+    bgMusicNodes._timerId = setTimeout(scheduleLoop, 400);
+  }
+
+  bgMusicNodes = { gain, _timerId: null };
+  scheduleLoop();
+}
+
+function stopBgMusic() {
+  if (!bgMusicNodes) return;
+  clearTimeout(bgMusicNodes._timerId);
+  bgMusicNodes.gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+  setTimeout(() => {
+    bgMusicNodes.gain.disconnect();
+    bgMusicNodes = null;
+  }, 600);
+}
+
+function pauseBgMusic() {
+  if (!bgMusicNodes) return;
+  clearTimeout(bgMusicNodes._timerId);
+  bgMusicNodes.gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+}
+
+function resumeBgMusic() {
+  if (!bgMusicNodes) return;
+  bgMusicNodes.gain.gain.linearRampToValueAtTime(0.035, audioCtx.currentTime + 0.3);
+  // Reschedule
+  function scheduleLoop() {
+    if (!bgMusicNodes) return;
+    const notes = [
+      523, 587, 659, 784, 659, 587, 523, 494,
+      440, 494, 523, 587, 659, 784, 880, 784,
+      659, 587, 523, 494, 440, 494, 523, 587,
+      659, 784, 880, 784, 659, 587, 523, 494
+    ];
+    const noteLen = 0.5;
+    const loopLen = notes.length * noteLen;
+    const now = audioCtx.currentTime;
+    let st = now;
+    notes.forEach((freq, i) => {
+      const t = st + i * noteLen;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.connect(g);
+      g.connect(bgMusicNodes.gain);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      g.gain.setValueAtTime(0.5, t);
+      g.gain.exponentialRampToValueAtTime(0.01, t + noteLen * 0.9);
+      osc.start(t);
+      osc.stop(t + noteLen);
+    });
+    bgMusicNodes._timerId = setTimeout(scheduleLoop, loopLen * 1000 - 100);
+  }
+  scheduleLoop();
+}
+
+
+
 
 function playSound(type) {
   const now = audioCtx.currentTime;
@@ -110,6 +374,7 @@ function startGame() {
     initPhysics();
     gameActive = true;
     startTimer();
+    startBgMusic();
   }, 1000);
 }
 
@@ -164,6 +429,7 @@ function togglePause() {
     clearInterval(timerInterval);
     if (runner) Runner.stop(runner);
     if (chuteRunner) Runner.stop(chuteRunner);
+    pauseBgMusic();
     icon.textContent = '▶';
     label.textContent = 'RESUME';
     // Show pause overlay
@@ -175,12 +441,15 @@ function togglePause() {
   } else {
     // Resume timer
     timerInterval = setInterval(() => {
+      if (gamePaused) return;
       gameTimer--;
       updateTimerDisplay();
+      playSound('tick');
       if (gameTimer <= 0) { clearInterval(timerInterval); endGame(); }
     }, 1000);
     if (runner) Runner.run(runner, engine);
     if (chuteRunner) Runner.run(chuteRunner, chuteEngine);
+    resumeBgMusic();
     icon.textContent = '⏸';
     label.textContent = 'PAUSE';
     // Remove pause overlay
@@ -406,7 +675,9 @@ function updateClaw() {
     clawOpen = Math.max(0, 1 - clawAnimFrame / 10);
     if (clawAnimFrame >= 10) {
       grabbedItem = tryGrab();
-      if (grabbedItem) playSound('grab');
+      if (grabbedItem) {
+        playSound('grab');
+      }
       gameState = 'lifting';
     }
   }
@@ -541,8 +812,18 @@ function animateDropToChute(item) {
       miniMeCount++;
       document.getElementById('score-value').textContent = miniMeCount;
       updateSideScore();
+      bounceScore();
+      // Sparkle burst at chute location
+      const cRectNow = chuteEl.getBoundingClientRect();
+      const vpRectNow = viewportEl.getBoundingClientRect();
+      const particleX = clampedX;
+      const particleY = 20;
+      spawnParticles(particleX + (cRectNow.left - vpRectNow.left), particleY + (cRectNow.top - vpRectNow.top), 15, 'heart');
       showYay(); playSound('yay');
-      if (miniMeCount >= 5) endGame();
+      if (miniMeCount >= 5) {
+        triggerConfetti();
+        setTimeout(() => endGame(), 1500);
+      }
     } else {
       playSound('collect');
     }
@@ -600,11 +881,17 @@ function updateTimerDisplay() {
   // Update timer bar
   const bar = document.getElementById('timer-bar');
   if (bar) bar.style.width = ((gameTimer / 60) * 100) + '%';
-  // Color change when low
+  // Color change + urgency pulse when low
   const timerEl = document.getElementById('timer-display');
+  const timerCard = document.querySelector('.timer-card');
   if (timerEl) {
-    if (gameTimer <= 10) timerEl.style.color = '#ff1744';
-    else timerEl.style.color = '#ff477e';
+    if (gameTimer <= 10) {
+      timerEl.style.color = '#ff1744';
+      if (timerCard) timerCard.classList.add('timer-urgent');
+    } else {
+      timerEl.style.color = '#ff477e';
+      if (timerCard) timerCard.classList.remove('timer-urgent');
+    }
   }
 }
 
@@ -613,6 +900,7 @@ function endGame() {
   if (!gameActive) return;
   gameActive = false;
   clearInterval(timerInterval);
+  stopBgMusic();
 
   // Update Finale Text Context based on score
   const eyebrow = document.getElementById('finale-eyebrow');
@@ -629,6 +917,17 @@ function endGame() {
     subtitle.innerHTML = '…every version of me<br>already belongs to you. 💕';
   }
 
+  // Populate finale stats
+  const timeTaken = 60 - gameTimer;
+  const mins = Math.floor(timeTaken / 60);
+  const secs = timeTaken % 60;
+  document.getElementById('finale-time').textContent = mins + ':' + String(secs).padStart(2, '0');
+  document.getElementById('finale-score').textContent = miniMeCount + '/5';
+
+  // Remove timer urgency
+  const timerCard = document.querySelector('.timer-card');
+  if (timerCard) timerCard.classList.remove('timer-urgent');
+
   setTimeout(() => {
     document.getElementById('game-screen').style.opacity = '0';
     document.getElementById('game-screen').style.transition = 'opacity 1.5s';
@@ -641,6 +940,9 @@ function endGame() {
       if (render) Render.stop(render);
       if (chuteRunner) Runner.stop(chuteRunner);
       if (chuteRender) Render.stop(chuteRender);
+      // Cleanup confetti
+      const cc = document.getElementById('confetti-canvas');
+      if (cc) cc.remove();
     }, 1600);
   }, 600);
 }
@@ -667,9 +969,19 @@ function customDraw() {
   ctx.font = '12px Fredoka One';
   ctx.fillText('DROP', sepX / 2, VH * 0.15);
 
-  // Claw Cable - Matching the reference image style
+  // Dynamic claw shadow on the floor
+  const shadowY = VH - 8;
+  const heightRatio = 1 - (clawCurrentY / VH);
+  const shadowWidth = 20 + heightRatio * 30;
+  const shadowAlpha = 0.06 + heightRatio * 0.12;
+  ctx.fillStyle = `rgba(74, 26, 44, ${shadowAlpha})`;
+  ctx.beginPath();
+  ctx.ellipse(clawX, shadowY, shadowWidth, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Claw Cable
   ctx.strokeStyle = outlineColor;
-  ctx.lineWidth = 6; // Thicker outline
+  ctx.lineWidth = 6;
   ctx.lineCap = 'round';
   ctx.beginPath();
   ctx.moveTo(clawX, 0);
@@ -686,6 +998,24 @@ function customDraw() {
 
   drawClaw(ctx, clawX, clawCurrentY, clawOpen);
 
+  // Subtle claw sparkle trail while moving
+  if (gameState === 'idle' && (keysPressed['ArrowLeft'] || keysPressed['ArrowRight'])) {
+    if (Math.random() > 0.7) {
+      particles.push({
+        x: clawX + (Math.random() - 0.5) * 20,
+        y: clawCurrentY + 30 + Math.random() * 10,
+        vx: (Math.random() - 0.5) * 1,
+        vy: Math.random() * 1.5,
+        life: 0.6,
+        decay: 0.03,
+        size: 2 + Math.random() * 3,
+        type: 'star',
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.1,
+      });
+    }
+  }
+
   for (const item of items) {
     if (item.caught) continue;
     const pos = item.body.position;
@@ -693,7 +1023,13 @@ function customDraw() {
     ctx.translate(pos.x, pos.y);
     ctx.rotate(item.body.angle);
     if (item.type === 'heart') drawHeart(ctx, 0, 0, item.radius * 1.1);
-    else drawMiniMe(ctx, 0, 0, item.radius, item.img);
+    else {
+      // Subtle glow around face dolls
+      ctx.shadowColor = 'rgba(255, 71, 126, 0.4)';
+      ctx.shadowBlur = 12;
+      drawMiniMe(ctx, 0, 0, item.radius, item.img);
+      ctx.shadowBlur = 0;
+    }
     ctx.restore();
   }
 
@@ -707,6 +1043,9 @@ function customDraw() {
     ctx.stroke();
     ctx.setLineDash([]);
   }
+
+  // Draw particles
+  updateAndDrawParticles(ctx);
 
   ctx.restore();
 }
@@ -868,9 +1207,50 @@ function createFloatingHearts() {
   }
 }
 
+// ===== MOBILE TOUCH CONTROLS =====
+function setupTouchControls() {
+  // Only show on touch devices
+  if (!('ontouchstart' in window)) return;
+  const controls = document.getElementById('touch-controls');
+  if (controls) controls.style.display = 'flex';
+
+  const leftBtn = document.getElementById('touch-left');
+  const rightBtn = document.getElementById('touch-right');
+  const catchBtn = document.getElementById('touch-catch');
+
+  if (!leftBtn || !rightBtn || !catchBtn) return;
+
+  // Touch hold for movement
+  let touchIntervals = {};
+  function startMove(dir) {
+    keysPressed[dir] = true;
+    touchIntervals[dir] = true;
+  }
+  function stopMove(dir) {
+    keysPressed[dir] = false;
+    touchIntervals[dir] = false;
+  }
+
+  leftBtn.addEventListener('touchstart', e => { e.preventDefault(); startMove('ArrowLeft'); });
+  leftBtn.addEventListener('touchend', e => { e.preventDefault(); stopMove('ArrowLeft'); });
+  leftBtn.addEventListener('touchcancel', e => { e.preventDefault(); stopMove('ArrowLeft'); });
+
+  rightBtn.addEventListener('touchstart', e => { e.preventDefault(); startMove('ArrowRight'); });
+  rightBtn.addEventListener('touchend', e => { e.preventDefault(); stopMove('ArrowRight'); });
+  rightBtn.addEventListener('touchcancel', e => { e.preventDefault(); stopMove('ArrowRight'); });
+
+  catchBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!gameActive) return;
+    if (gameState === 'idle') { gameState = 'dropping'; playSound('drop'); }
+    else if (gameState === 'holding') { gameState = 'releasing'; clawAnimFrame = 0; playSound('release'); }
+  });
+}
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
   createFloatingHearts();
+  setupTouchControls();
   // Add decorative emojis to the machine container
   const wrapper = document.querySelector('.custom-machine-container');
   if (wrapper) {
