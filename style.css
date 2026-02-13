@@ -707,6 +707,7 @@ body {
 .custom-machine-container {
   position: relative;
   width: min(480px, 60vw);
+  max-height: 85vh;
   aspect-ratio: 555 / 884;
   display: flex;
   align-items: center;
@@ -722,6 +723,8 @@ body {
   object-fit: contain;
   pointer-events: none;
   z-index: 1;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* 1. Viewport (The Glass Window) */
@@ -1259,7 +1262,8 @@ body {
   }
 
   .custom-machine-container {
-    width: min(480px, 90vw);
+    width: min(420px, 85vw);
+    max-height: 80vh;
   }
 
   #game-screen {
@@ -1323,6 +1327,7 @@ body {
   }
 
   .custom-machine-container {
-    width: min(480px, 95vw);
+    width: min(380px, 92vw);
+    max-height: 78vh;
   }
 }

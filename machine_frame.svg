@@ -2,6 +2,8 @@
 <style>
   .bulb-row-1, .bulb-row-2, .bulb-row-3, .bulb-row-4 {
     animation: bulbGlow 1.6s ease-in-out infinite;
+    will-change: filter;
+    transform: translateZ(0);
   }
   .bulb-row-1 { animation-delay: 0s; }
   .bulb-row-2 { animation-delay: 0.4s; }
@@ -9,6 +11,7 @@
   .bulb-row-4 { animation-delay: 1.2s; }
   .bulb-light {
     animation: bulbFill 1.6s ease-in-out infinite;
+    will-change: fill;
   }
   .bulb-row-1 .bulb-light { animation-delay: 0s; }
   .bulb-row-2 .bulb-light { animation-delay: 0.4s; }

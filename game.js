@@ -1,10 +1,11 @@
 const { Engine, Render, Runner, Bodies, Body, Composite, Events } = Matter;
 
 // Constants must be defined first
-const CLAW_Y_TOP = 40;
-const CLAW_SPEED = 1.4;
-const GRAB_RADIUS = 32;
+let CLAW_Y_TOP = 40;
+let CLAW_SPEED = 1.4;
+let GRAB_RADIUS = 32;
 const SEPARATOR_X_RATIO = 0.15;
+let scaleFactor = 1;
 
 let engine, render, runner;
 let chuteEngine, chuteRender, chuteRunner;
@@ -490,6 +491,12 @@ function initPhysics() {
   VW = viewportEl.clientWidth;
   VH = viewportEl.clientHeight;
 
+  // Scale everything relative to the 460px design width
+  scaleFactor = VW / 460;
+  CLAW_Y_TOP = Math.round(40 * scaleFactor);
+  CLAW_SPEED = 1.4 * scaleFactor;
+  GRAB_RADIUS = Math.round(32 * scaleFactor);
+
   engine = Engine.create({ gravity: { x: 0, y: 1.2 } });
 
   render = Render.create({
@@ -576,11 +583,14 @@ function spawnItems(sepX) {
   items = [];
   const startX = sepX + 25, endX = VW - 30; // Main play area is on the RIGHT
 
+  const heartR = () => (15 + Math.random() * 5) * scaleFactor;
+  const faceR = Math.round(28 * scaleFactor);
+
   // 1. Foundation: 8 Hearts at the bottom to act as a base
   for (let i = 0; i < 8; i++) {
     const x = startX + Math.random() * (endX - startX);
     const y = VH - 30 - (Math.random() * 20);
-    const r = 15 + Math.random() * 5;
+    const r = heartR();
     const body = Bodies.circle(x, y, r, {
       restitution: 0.45, friction: 0.3, density: 0.002,
       render: { visible: false }, label: 'heart'
@@ -601,14 +611,14 @@ function spawnItems(sepX) {
     const y = VH - 150 + (Math.random() * 90);
 
     if (type === 'minime') {
-      const body = Bodies.circle(x, y, 28, {
+      const body = Bodies.circle(x, y, faceR, {
         restitution: 0.35, friction: 0.4, density: 0.003,
         render: { visible: false }, label: 'minime'
       });
-      items.push({ body, type: 'minime', radius: 28, caught: false, img: faceImages[i % faceImages.length] });
+      items.push({ body, type: 'minime', radius: faceR, caught: false, img: faceImages[i % faceImages.length] });
       Composite.add(engine.world, body);
     } else {
-      const r = 15 + Math.random() * 5;
+      const r = heartR();
       const body = Bodies.circle(x, y, r, {
         restitution: 0.45, friction: 0.3, density: 0.002,
         render: { visible: false }, label: 'heart'
@@ -643,15 +653,15 @@ function updateClaw() {
   clawSway += clawSwayVel;
 
   if (gameState === 'idle') {
-    if (keysPressed['ArrowLeft']) clawX = Math.max(20, clawX - CLAW_SPEED);
-    if (keysPressed['ArrowRight']) clawX = Math.min(VW - 20, clawX + CLAW_SPEED);
+    if (keysPressed['ArrowLeft']) clawX = Math.max(20 * scaleFactor, clawX - CLAW_SPEED);
+    if (keysPressed['ArrowRight']) clawX = Math.min(VW - 20 * scaleFactor, clawX + CLAW_SPEED);
     clawCurrentY = CLAW_Y_TOP; clawOpen = 1;
   }
 
   if (gameState === 'dropping') {
-    clawCurrentY += 1.3;
+    clawCurrentY += 1.3 * scaleFactor;
     // Stop early if the claw tip reaches the topmost item under it
-    const tipY = clawCurrentY + 30;
+    const tipY = clawCurrentY + 30 * scaleFactor;
     let hitItem = false;
     for (const item of items) {
       if (item.caught) continue;
@@ -663,7 +673,7 @@ function updateClaw() {
         break;
       }
     }
-    const maxDrop = VH - 50;
+    const maxDrop = VH - 50 * scaleFactor;
     if (hitItem || clawCurrentY >= maxDrop) {
       if (clawCurrentY > maxDrop) clawCurrentY = maxDrop;
       gameState = 'grabbing'; clawAnimFrame = 0;
@@ -683,9 +693,9 @@ function updateClaw() {
   }
 
   if (gameState === 'lifting') {
-    clawCurrentY -= 1.2;
+    clawCurrentY -= 1.2 * scaleFactor;
     if (grabbedItem) {
-      Body.setPosition(grabbedItem.body, { x: clawX, y: clawCurrentY + 32 });
+      Body.setPosition(grabbedItem.body, { x: clawX, y: clawCurrentY + 32 * scaleFactor });
       Body.setVelocity(grabbedItem.body, { x: 0, y: 0 });
     }
     if (clawCurrentY <= CLAW_Y_TOP) {
@@ -696,10 +706,10 @@ function updateClaw() {
   }
 
   if (gameState === 'holding') {
-    if (keysPressed['ArrowLeft']) clawX = Math.max(20, clawX - CLAW_SPEED);
-    if (keysPressed['ArrowRight']) clawX = Math.min(VW - 20, clawX + CLAW_SPEED);
+    if (keysPressed['ArrowLeft']) clawX = Math.max(20 * scaleFactor, clawX - CLAW_SPEED);
+    if (keysPressed['ArrowRight']) clawX = Math.min(VW - 20 * scaleFactor, clawX + CLAW_SPEED);
     if (grabbedItem) {
-      Body.setPosition(grabbedItem.body, { x: clawX, y: clawCurrentY + 32 });
+      Body.setPosition(grabbedItem.body, { x: clawX, y: clawCurrentY + 32 * scaleFactor });
       Body.setVelocity(grabbedItem.body, { x: 0, y: 0 });
     }
   }
@@ -963,25 +973,25 @@ function customDraw() {
 
   // Arrow pointing down and label
   ctx.fillStyle = outlineColor;
-  ctx.font = 'bold 20px Fredoka One';
+  ctx.font = `bold ${Math.round(20 * scaleFactor)}px Fredoka One`;
   ctx.textAlign = 'center';
   ctx.fillText('▼', sepX / 2, VH * 0.25);
-  ctx.font = '12px Fredoka One';
+  ctx.font = `${Math.round(12 * scaleFactor)}px Fredoka One`;
   ctx.fillText('DROP', sepX / 2, VH * 0.15);
 
   // Dynamic claw shadow on the floor
   const shadowY = VH - 8;
   const heightRatio = 1 - (clawCurrentY / VH);
-  const shadowWidth = 20 + heightRatio * 30;
+  const shadowWidth = (20 + heightRatio * 30) * scaleFactor;
   const shadowAlpha = 0.06 + heightRatio * 0.12;
   ctx.fillStyle = `rgba(74, 26, 44, ${shadowAlpha})`;
   ctx.beginPath();
-  ctx.ellipse(clawX, shadowY, shadowWidth, 5, 0, 0, Math.PI * 2);
+  ctx.ellipse(clawX, shadowY, shadowWidth, 5 * scaleFactor, 0, 0, Math.PI * 2);
   ctx.fill();
 
   // Claw Cable
   ctx.strokeStyle = outlineColor;
-  ctx.lineWidth = 6;
+  ctx.lineWidth = 6 * scaleFactor;
   ctx.lineCap = 'round';
   ctx.beginPath();
   ctx.moveTo(clawX, 0);
@@ -990,7 +1000,7 @@ function customDraw() {
 
   // Inner cable color
   ctx.strokeStyle = '#f0f0f0';
-  ctx.lineWidth = 3.5;
+  ctx.lineWidth = 3.5 * scaleFactor;
   ctx.beginPath();
   ctx.moveTo(clawX, 0);
   ctx.lineTo(clawX, clawCurrentY - 10);
@@ -1117,6 +1127,7 @@ function drawMiniMe(ctx, x, y, r, img) {
 function drawClaw(ctx, x, y, openness) {
   ctx.save();
   ctx.translate(x, y);
+  ctx.scale(scaleFactor, scaleFactor);
 
   // Apply Sway
   ctx.rotate(clawSway);
